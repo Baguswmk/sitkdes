@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, Search, Filter, Eye, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Search, Eye, Edit, RefreshCw } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
+import { Pagination } from "@/components/ui/Pagination";
 import { StatusData, JenisTanah } from "@prisma/client";
-import { toast } from "sonner";
 
 const STATUS_BADGE: Record<string, string> = {
   DRAFT: "bg-gray-200 text-gray-700",
@@ -28,6 +28,8 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
   const [jenisTanah, setJenisTanah] = useState<JenisTanah | "">("");
   const [padukuhanId, setPadukuhanId] = useState("");
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const { data, isLoading, refetch } = trpc.tkd.listAdmin.useQuery({
     page,
     perPage: 10,
@@ -37,14 +39,53 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
     padukuhanId: padukuhanId || undefined,
   });
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetch();
+    setIsRefreshing(false);
+  };
+
   return (
     <div className="animate-fadeUp">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <div className="section-title-heritage" style={{ margin: 0 }}>DATA TANAH KAS DESA</div>
-        <Link href="/admin/tkd/create" className="btn-heritage" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
-          <Plus size={16} /> TAMBAH DATA
-        </Link>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing || isLoading}
+            title="Refresh data terbaru"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 14px",
+              background: "transparent",
+              border: "1.5px solid var(--gold-500)",
+              borderRadius: 6,
+              cursor: (isRefreshing || isLoading) ? "not-allowed" : "pointer",
+              fontFamily: '"Cinzel", serif',
+              fontWeight: 600,
+              fontSize: 12,
+              color: "var(--navy-800)",
+              letterSpacing: 0.5,
+              opacity: (isRefreshing || isLoading) ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
+            <RefreshCw
+              size={14}
+              style={{
+                animation: (isRefreshing || isLoading) ? "spin 0.8s linear infinite" : "none",
+              }}
+            />
+            {isRefreshing ? "MEMUAT..." : "REFRESH"}
+          </button>
+          <Link href="/admin/tkd/create" className="btn-heritage" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+            <Plus size={16} /> TAMBAH DATA
+          </Link>
+        </div>
       </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Filters */}
       <div className="card-heritage" style={{ padding: 20, marginBottom: 24, display: "flex", gap: 16, flexWrap: "wrap" }}>
@@ -158,26 +199,15 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
         </div>
 
         {/* Pagination */}
-        {data && data.totalPages > 1 && (
-          <div style={{ display: "flex", justifyContent: "center", gap: 8, padding: 16, borderTop: "1px solid rgba(160,125,47,.1)" }}>
-            <button
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
-              style={{ padding: "6px 12px", background: "var(--cream-50)", border: "1px solid var(--gold-600)", borderRadius: 4, cursor: page === 1 ? "not-allowed" : "pointer", opacity: page === 1 ? 0.5 : 1 }}
-            >
-              Sebelumnya
-            </button>
-            <div style={{ padding: "6px 12px", fontFamily: '"Cinzel", serif', fontWeight: 600 }}>
-              {page} / {data.totalPages}
-            </div>
-            <button
-              disabled={page === data.totalPages}
-              onClick={() => setPage(page + 1)}
-              style={{ padding: "6px 12px", background: "var(--cream-50)", border: "1px solid var(--gold-600)", borderRadius: 4, cursor: page === data.totalPages ? "not-allowed" : "pointer", opacity: page === data.totalPages ? 0.5 : 1 }}
-            >
-              Selanjutnya
-            </button>
-          </div>
+        {data && (
+          <Pagination
+            currentPage={page}
+            totalPages={data.totalPages}
+            totalItems={data.total}
+            itemsPerPage={10}
+            onPageChange={setPage}
+            itemName="data TKD"
+          />
         )}
       </div>
     </div>

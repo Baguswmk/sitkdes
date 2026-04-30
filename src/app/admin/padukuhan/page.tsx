@@ -9,6 +9,11 @@ export default async function PadukuhanPage() {
 
   const padukuhanList = await db.padukuhan.findMany({
     orderBy: { urutan: "asc" },
+    include: {
+      _count: {
+        select: { tanahKas: { where: { deletedAt: null } } },
+      },
+    },
   });
 
   return <PadukuhanClient initialData={padukuhanList} />;

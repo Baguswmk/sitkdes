@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth/config";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export default auth((req: NextRequest & { auth: Awaited<ReturnType<typeof auth>> }) => {
+export default auth((req) => {
   const { pathname } = req.nextUrl;
   const session = req.auth;
 

@@ -2,8 +2,10 @@ import { auth } from "@/lib/auth/config";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db/client";
 import Link from "next/link";
-import { ArrowLeft, Map as MapIcon, Edit, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Map as MapIcon, Edit } from "lucide-react";
 import { TkdActionButtons } from "./TkdActionButtons";
+import { TkdDetailMap } from "./TkdDetailMap";
+import { TkdSubmitButton } from "./TkdSubmitButton";
 
 export default async function TkdDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -20,8 +22,17 @@ export default async function TkdDetailPage({ params }: { params: Promise<{ id: 
     return <div className="p-8 text-center">Data TKD tidak ditemukan.</div>;
   }
 
+  // Fetch geometry as GeoJSON (PostGIS field — not available via normal Prisma select)
+  const geoRow = await db.$queryRaw<[{ geojson: string }]>`
+    SELECT ST_AsGeoJSON(geometry)::text as geojson
+    FROM "TanahKasDesa" WHERE id = ${resolvedParams.id}
+  `;
+  const geometry = geoRow[0]?.geojson ? JSON.parse(geoRow[0].geojson) as GeoJSON.Geometry : null;
+
   const userRole = (session.user as any)?.role || "OPERATOR";
+  const userId = (session.user as any)?.id;
   const isAdmin = userRole === "ADMIN_DESA" || userRole === "SUPER_ADMIN";
+  const isOwner = (tkd as any).createdById === userId;
 
   return (
     <div className="animate-fadeUp max-w-5xl mx-auto">
@@ -37,6 +48,11 @@ export default async function TkdDetailPage({ params }: { params: Promise<{ id: 
               <Edit size={16} /> Edit Data
             </Link>
           )}
+          {/* Operator: tombol ajukan review jika masih DRAFT dan milik sendiri */}
+          {tkd.status === "DRAFT" && (isOwner || isAdmin) && (
+            <TkdSubmitButton tkdId={tkd.id} />
+          )}
+          {/* Admin: tombol approve/reject jika PENDING_REVIEW */}
           {isAdmin && tkd.status === "PENDING_REVIEW" && (
             <TkdActionButtons tkdId={tkd.id} />
           )}
@@ -80,9 +96,22 @@ export default async function TkdDetailPage({ params }: { params: Promise<{ id: 
             <div style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: '"Cinzel", serif', fontWeight: 600, color: "var(--navy-900)", marginBottom: 12, padding: "0 8px" }}>
               <MapIcon size={18} /> PETA LOKASI
             </div>
-            <div style={{ height: 300, background: "var(--cream-100)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontStyle: "italic", color: "var(--ink-soft)" }}>Map Viewer Area</span>
-            </div>
+            {geometry ? (
+              <TkdDetailMap
+                tkdId={tkd.id}
+                nama={tkd.nama}
+                padukuhan={tkd.padukuhan.nama}
+                jenisTanah={tkd.jenisTanah}
+                penggunaan={tkd.penggunaan}
+                pemanfaatan={tkd.pemanfaatan}
+                luasHa={Number(tkd.luasHa)}
+                geometry={geometry}
+              />
+            ) : (
+              <div style={{ height: 300, background: "var(--cream-100)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ fontStyle: "italic", color: "var(--ink-soft)" }}>Data geometri tidak tersedia</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -46,7 +46,7 @@ export function validatePasswordPolicy(
 ): PasswordValidationResult {
   const result = passwordPolicySchema.safeParse(plain);
   if (!result.success) {
-    return { ok: false, message: result.error.errors[0]?.message ?? "Password tidak valid" };
+    return { ok: false, message: result.error.issues[0]?.message ?? "Password tidak valid" };
   }
   return { ok: true };
 }

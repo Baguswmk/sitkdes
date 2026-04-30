@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth/config";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db/client";
-import { TkdCreateClient } from "../../create/TkdCreateClient"; // Re-using form component
+import { TkdCreateClient } from "../../create/TkdCreateClient";
 
 export default async function TkdEditPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -17,6 +17,13 @@ export default async function TkdEditPage({ params }: { params: Promise<{ id: st
     return <div className="p-8 text-center">Data TKD tidak ditemukan.</div>;
   }
 
+  // Fetch geometry as GeoJSON string for pre-filling the MapEditor
+  const geoRow = await db.$queryRaw<[{ geojson: string }]>`
+    SELECT ST_AsGeoJSON(geometry)::text as geojson
+    FROM "TanahKasDesa" WHERE id = ${resolvedParams.id}
+  `;
+  const geometryGeoJson = geoRow[0]?.geojson ?? undefined;
+
   const padukuhanList = await db.padukuhan.findMany({
     where: { isActive: true },
     select: { id: true, nama: true },
@@ -24,14 +31,23 @@ export default async function TkdEditPage({ params }: { params: Promise<{ id: st
   });
 
   return (
-    <div className="animate-fadeUp max-w-4xl mx-auto">
-      <div className="section-title-heritage" style={{ marginBottom: 24 }}>EDIT DATA TKD</div>
-      <p style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: 16, color: "var(--ink-soft)", marginBottom: 24 }}>
-        Anda sedang mengedit data {tkd.nama}.
-      </p>
-      
-      {/* Reusing TkdCreateClient for Edit by passing initialValues (need to implement in component) */}
-      <TkdCreateClient padukuhanOptions={padukuhanList} />
-    </div>
+    <TkdCreateClient
+      padukuhanOptions={padukuhanList}
+      tkdId={tkd.id}
+      initialData={{
+        nama: tkd.nama,
+        deskripsi: tkd.deskripsi ?? undefined,
+        jenisTanah: tkd.jenisTanah,
+        kategoriPenggunaan: tkd.kategoriPenggunaan,
+        penggunaan: tkd.penggunaan,
+        pemanfaatan: tkd.pemanfaatan ?? undefined,
+        padukuhanId: tkd.padukuhanId,
+        alamat: tkd.alamat ?? undefined,
+        statusKepemilikan: tkd.statusKepemilikan ?? undefined,
+        alasHak: tkd.alasHak ?? undefined,
+        nomorSertifikat: tkd.nomorSertifikat ?? undefined,
+        geometryGeoJson,
+      }}
+    />
   );
 }

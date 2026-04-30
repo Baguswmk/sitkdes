@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc/client";
+import { Pagination } from "@/components/ui/Pagination";
 
 /* ─── Types ─────────────────────────────────────────── */
 interface PadukuhanOption {
@@ -243,14 +244,14 @@ export function DataClient({ padukuhanOptions }: Props) {
           {/* Donut chart by jenis */}
           <div className="card-heritage" style={{ padding: 20, flex: 1 }}>
             <div className="label-heritage" style={{ marginBottom: 16 }}>DISTRIBUSI JENIS TANAH</div>
-            <DonutChart data={rawData} />
+            <DonutChart data={rawData as TkdPublicRow[]} />
           </div>
         </div>
 
         {/* Right: bar chart per padukuhan */}
         <div className="card-heritage" style={{ padding: 24 }}>
           <div className="label-heritage" style={{ marginBottom: 16 }}>SEBARAN PER PADUKUHAN</div>
-          <BarChartPadukuhan data={rawData} />
+          <BarChartPadukuhan data={rawData as TkdPublicRow[]} />
         </div>
       </div>
 
@@ -304,9 +305,9 @@ export function DataClient({ padukuhanOptions }: Props) {
             onChange={(e) => { setFilterJenis(e.target.value); handleFilterChange(); }}
           >
             <option value="">Jenis Tanah Kalurahan</option>
-            <option value="KAS">Tanah Kas Desa</option>
+            <option value="TANAH_KAS">Tanah Kas Desa</option>
             <option value="PELUNGGUH">Pelungguh</option>
-            <option value="PENGAREM">Pengarem-arem</option>
+            <option value="PENGAREM_AREM">Pengarem-arem</option>
             <option value="LAINNYA">Lainnya</option>
           </select>
         </div>
@@ -378,7 +379,7 @@ export function DataClient({ padukuhanOptions }: Props) {
               TANAH KAS KALURAHAN
             </div>
             <div style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 28, fontWeight: 700, color: "var(--navy-900)", lineHeight: 1 }}>
-              {fmtLuas(luasByJenis("KAS"))}
+              {fmtLuas(luasByJenis("TANAH_KAS"))}
             </div>
           </div>
           <div className="stat-card-heritage" style={{ flex: 1 }}>
@@ -386,7 +387,7 @@ export function DataClient({ padukuhanOptions }: Props) {
               PENGAREM-AREM
             </div>
             <div style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 28, fontWeight: 700, color: "var(--navy-900)", lineHeight: 1 }}>
-              {fmtLuas(luasByJenis("PENGAREM"))}
+              {fmtLuas(luasByJenis("PENGAREM_AREM"))}
             </div>
           </div>
         </div>
@@ -420,7 +421,7 @@ export function DataClient({ padukuhanOptions }: Props) {
             alignItems: "center",
           }}
         >
-          <DonutChart data={filtered} />
+          <DonutChart data={filtered as TkdPublicRow[]} />
         </div>
       </div>
 
@@ -504,87 +505,14 @@ export function DataClient({ padukuhanOptions }: Props) {
         </div>
 
         {/* ── Pagination ── */}
-        {totalPages > 1 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "14px 20px",
-              borderTop: "1px solid rgba(160,125,47,.2)",
-              background: "rgba(255,248,210,.35)",
-              fontFamily: '"Cormorant Garamond", serif',
-              fontSize: 16,
-              color: "var(--ink-soft)",
-            }}
-          >
-            <span>
-              Menampilkan {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} dari {filtered.length} bidang
-            </span>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                style={{
-                  fontFamily: '"Cinzel", serif',
-                  fontSize: 11,
-                  letterSpacing: "1.5px",
-                  color: page === 1 ? "var(--cream-300)" : "var(--gold-100)",
-                  background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
-                  border: "1px solid var(--gold-600)",
-                  padding: "7px 18px",
-                  borderRadius: 999,
-                  cursor: page === 1 ? "not-allowed" : "pointer",
-                  opacity: page === 1 ? 0.5 : 1,
-                  transition: "opacity .2s",
-                }}
-              >
-                ← Prev
-              </button>
-              {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  style={{
-                    fontFamily: '"Cinzel", serif',
-                    fontSize: 11,
-                    width: 34,
-                    height: 34,
-                    borderRadius: "50%",
-                    border: p === page ? "1.5px solid var(--gold-400)" : "1px solid var(--gold-600)",
-                    background: p === page
-                      ? "linear-gradient(180deg, var(--gold-500), var(--gold-600))"
-                      : "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
-                    color: "var(--cream-100)",
-                    cursor: "pointer",
-                    fontWeight: p === page ? 700 : 400,
-                  }}
-                >
-                  {p}
-                </button>
-              ))}
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                style={{
-                  fontFamily: '"Cinzel", serif',
-                  fontSize: 11,
-                  letterSpacing: "1.5px",
-                  color: page === totalPages ? "var(--cream-300)" : "var(--gold-100)",
-                  background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
-                  border: "1px solid var(--gold-600)",
-                  padding: "7px 18px",
-                  borderRadius: 999,
-                  cursor: page === totalPages ? "not-allowed" : "pointer",
-                  opacity: page === totalPages ? 0.5 : 1,
-                  transition: "opacity .2s",
-                }}
-              >
-                Next →
-              </button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={filtered.length}
+          itemsPerPage={PAGE_SIZE}
+          onPageChange={setPage}
+          itemName="bidang"
+        />
       </div>
     </div>
   );

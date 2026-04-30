@@ -44,8 +44,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         const ipAddress =
-          (req as Request & { headers?: Headers })?.headers
-            ?.get?.("x-forwarded-for") ?? undefined;
+          (req as Request & { headers?: Headers })?.headers?.get?.(
+            "x-forwarded-for",
+          ) ?? undefined;
 
         // 3. Check account status
         if (user.status === UserStatus.DISABLED) {
@@ -139,29 +140,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id as string;
-        token.username = (user as { username: string }).username;
-        token.role = (user as { role: string }).role;
-        token.mustChangePassword = (
-          user as { mustChangePassword: boolean }
-        ).mustChangePassword;
-        token.passwordExpired = (
-          user as { passwordExpired: boolean }
-        ).passwordExpired;
+        token.id = user.id;
+        token.username = user.username;
+        token.role = user.role;
+        token.mustChangePassword = user.mustChangePassword;
+        token.passwordExpired = user.passwordExpired;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
-        (session.user as Record<string, unknown>).username =
-          token.username as string;
-        (session.user as Record<string, unknown>).role =
-          token.role as string;
-        (session.user as Record<string, unknown>).mustChangePassword =
-          token.mustChangePassword as boolean;
-        (session.user as Record<string, unknown>).passwordExpired =
-          token.passwordExpired as boolean;
+      if (token && session.user) {
+        session.user.id = token.id;
+        session.user.username = token.username;
+        session.user.role = token.role;
+        session.user.mustChangePassword = token.mustChangePassword;
+        session.user.passwordExpired = token.passwordExpired;
       }
       return session;
     },

@@ -313,6 +313,86 @@ export const tkdRouter = createTRPCRouter({
     }),
 
   /**
+   * Update TKD — OPERATOR+ (own record only, unless Admin).
+   */
+  update: operatorProcedure
+    .input(tkdUpdateSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { id, geometryGeoJson, ...rest } = input;
+      const callerRole = (ctx.session.user as { role: UserRole }).role;
+      const callerId = ctx.session.user.id;
+
+      const tkd = await ctx.db.tanahKasDesa.findFirst({
+        where: {
+          id,
+          deletedAt: null,
+          ...(callerRole === UserRole.OPERATOR ? { createdById: callerId } : {}),
+        },
+      });
+
+      if (!tkd) throw new TRPCError({ code: "NOT_FOUND", message: "Data TKD tidak ditemukan" });
+      if (tkd.status === "APPROVED") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Data yang sudah disetujui tidak bisa diedit" });
+      }
+
+      // Build update data
+      const updateData: Record<string, unknown> = {
+        ...rest,
+        updatedById: callerId,
+        updatedAt: new Date(),
+      };
+
+      // If geometry provided, recalculate area via PostGIS
+      if (geometryGeoJson) {
+        const areaResult = await ctx.db.$queryRaw<[{ area_m2: number }]>`
+          SELECT ST_Area(
+            ST_Transform(
+              ST_SetSRID(ST_GeomFromGeoJSON(${geometryGeoJson}), 4326),
+              32749
+            )
+          ) as area_m2
+        `;
+        const luasM2 = areaResult[0]?.area_m2 ?? 0;
+        const luasHa = luasM2 / 10000;
+
+        await ctx.db.$executeRaw`
+          UPDATE "TanahKasDesa" SET
+            geometry = ST_SetSRID(ST_GeomFromGeoJSON(${geometryGeoJson}), 4326),
+            centroid = ST_Centroid(ST_SetSRID(ST_GeomFromGeoJSON(${geometryGeoJson}), 4326)),
+            "luasM2" = ${luasM2},
+            "luasHa" = ${luasHa},
+            "updatedAt" = NOW()
+          WHERE id = ${id}
+        `;
+        delete updateData.luasM2;
+        delete updateData.luasHa;
+      }
+
+      // Update non-geometry fields (exclude geometry-related already handled above)
+      delete updateData.updatedAt; // handled by raw or prisma
+      const { updatedById, ...prismaUpdateRest } = updateData;
+      await ctx.db.tanahKasDesa.update({
+        where: { id },
+        data: {
+          ...prismaUpdateRest,
+          updatedById: callerId,
+          // Reset to DRAFT if previously REJECTED, so it can be re-submitted
+          ...(tkd.status === "REJECTED" ? { status: "DRAFT" } : {}),
+        } as never,
+      });
+
+      await logActivity({
+        userId: callerId,
+        action: AuditAction.TKD_CREATED, // reuse — no dedicated UPDATE action
+        entityType: "TanahKasDesa",
+        entityId: id,
+        description: `TKD "${tkd.nama}" diperbarui`,
+      });
+
+      return { id };
+    }),
+
+  /**
    * Submit TKD for review — OPERATOR+.
    */
   submit: operatorProcedure
