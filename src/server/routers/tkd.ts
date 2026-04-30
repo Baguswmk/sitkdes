@@ -105,6 +105,75 @@ export const tkdRouter = createTRPCRouter({
     }),
 
   /**
+   * Admin list spatial — all statuses, returns GeoJSON.
+   */
+  listSpatialAdmin: operatorProcedure
+    .input(
+      z.object({
+        padukuhanId: z.string().optional(),
+        jenisTanah: z.nativeEnum(JenisTanah).optional(),
+        penggunaan: z.string().optional(),
+        status: z.nativeEnum(StatusData).optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const callerRole = (ctx.session.user as { role: UserRole }).role;
+      const callerId = ctx.session.user.id;
+      
+      const inParams = input || {};
+
+      const rows = await ctx.db.$queryRaw<
+        Array<{
+          id: string;
+          nama: string;
+          padukuhan_nama: string;
+          jenis_tanah: string;
+          penggunaan: string;
+          pemanfaatan: string | null;
+          luas_m2: number;
+          luas_ha: number;
+          status: string;
+          geojson: string;
+        }>
+      >`
+        SELECT
+          t.id,
+          t.nama,
+          p.nama as padukuhan_nama,
+          t."jenisTanah" as jenis_tanah,
+          t.penggunaan,
+          t.pemanfaatan,
+          t."luasM2" as luas_m2,
+          t."luasHa" as luas_ha,
+          t.status::text as status,
+          ST_AsGeoJSON(t.geometry)::text as geojson
+        FROM "TanahKasDesa" t
+        JOIN "Padukuhan" p ON t."padukuhanId" = p.id
+        WHERE t."deletedAt" IS NULL
+          ${inParams.padukuhanId ? Prisma.sql`AND t."padukuhanId" = ${inParams.padukuhanId}` : Prisma.empty}
+          ${inParams.jenisTanah ? Prisma.sql`AND t."jenisTanah" = ${inParams.jenisTanah}::"JenisTanah"` : Prisma.empty}
+          ${inParams.penggunaan ? Prisma.sql`AND t.penggunaan ILIKE ${'%' + inParams.penggunaan + '%'}` : Prisma.empty}
+          ${inParams.status ? Prisma.sql`AND t.status = ${inParams.status}::"StatusData"` : Prisma.empty}
+          ${callerRole === UserRole.OPERATOR ? Prisma.sql`AND t."createdById" = ${callerId}` : Prisma.empty}
+        ORDER BY t."createdAt" DESC
+        LIMIT 500
+      `;
+
+      return rows.map((r) => ({
+        id: r.id,
+        nama: r.nama,
+        padukuhan: r.padukuhan_nama,
+        jenisTanah: r.jenis_tanah,
+        penggunaan: r.penggunaan,
+        pemanfaatan: r.pemanfaatan,
+        luasM2: r.luas_m2,
+        luasHa: r.luas_ha,
+        status: r.status,
+        geometry: JSON.parse(r.geojson) as GeoJSON.Geometry,
+      }));
+    }),
+
+  /**
    * Admin list with filters, pagination.
    */
   listAdmin: operatorProcedure

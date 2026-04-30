@@ -64,4 +64,7 @@ export const AuditAction = {
   PADUKUHAN_CREATED: "padukuhan_created",
   PADUKUHAN_UPDATED: "padukuhan_updated",
   PADUKUHAN_DELETED: "padukuhan_deleted",
+
+  // System
+  SYSTEM_UPDATED: "system_updated",
 } as const;

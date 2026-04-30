@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 const NAV_LINKS = [
   { href: "/", label: "Beranda" },
@@ -210,37 +211,35 @@ function ProfileChip({
             PROFIL SAYA
           </Link>
 
-          <form action="/api/auth/signout" method="POST">
-            <button
-              type="submit"
-              role="menuitem"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                width: "100%",
-                padding: "11px 16px",
-                fontFamily: '"Cinzel", serif',
-                fontSize: 11,
-                letterSpacing: "1.5px",
-                color: "#ef9a9a",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                textAlign: "left",
-                transition: "background .15s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,154,154,.08)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = "";
-              }}
-            >
-              <LogOut size={14} style={{ color: "#ef9a9a", flexShrink: 0 }} />
-              KELUAR
-            </button>
-          </form>
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            role="menuitem"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              width: "100%",
+              padding: "11px 16px",
+              fontFamily: '"Cinzel", serif',
+              fontSize: 11,
+              letterSpacing: "1.5px",
+              color: "#ef9a9a",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              textAlign: "left",
+              transition: "background .15s",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,154,154,.08)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "";
+            }}
+          >
+            <LogOut size={14} style={{ color: "#ef9a9a", flexShrink: 0 }} />
+            KELUAR
+          </button>
         </div>
       )}
     </div>
