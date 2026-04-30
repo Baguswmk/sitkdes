@@ -82,7 +82,7 @@ export function TkdCreateClient({ padukuhanOptions, tkdId, initialData }: Props)
   const onSubmit = async (data: FormValues) => {
     try {
       const selectedPadukuhan = padukuhanOptions.find(p => p.id === data.padukuhanId)?.nama || "Padukuhan";
-      let jenisLabel = data.jenisTanah;
+      let jenisLabel: string = data.jenisTanah;
       if (data.jenisTanah === "TANAH_KAS") jenisLabel = "Tanah Kas";
       else if (data.jenisTanah === "PELUNGGUH") jenisLabel = "Pelungguh";
       else if (data.jenisTanah === "PENGAREM_AREM") jenisLabel = "Pengarem-arem";

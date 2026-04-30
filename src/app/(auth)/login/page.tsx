@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -8,6 +8,14 @@ import { Eye, EyeOff, LogIn } from "lucide-react";
 import type { Metadata } from "next";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: "center", padding: 40, fontFamily: 'var(--font-cormorant)', fontSize: 18, fontStyle: "italic", color: "var(--ink-soft)" }}>Memuat form login...</div>}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/admin";
