@@ -17,7 +17,7 @@ type LogActivityParams = {
  * NEVER include sensitive data (passwords, tokens) in metadata.
  */
 export async function logActivity(
-  params: LogActivityParams
+  params: LogActivityParams,
 ): Promise<ActivityLog> {
   return db.activityLog.create({
     data: {
@@ -59,7 +59,7 @@ export const AuditAction = {
   USER_UPDATED: "user_updated",
   USER_DISABLED: "user_disabled",
   USER_ENABLED: "user_enabled",
-
+  USER_DELETED: "user_deleted",
   // Padukuhan
   PADUKUHAN_CREATED: "padukuhan_created",
   PADUKUHAN_UPDATED: "padukuhan_updated",
