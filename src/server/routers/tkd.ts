@@ -154,7 +154,7 @@ export const tkdRouter = createTRPCRouter({
           ${inParams.jenisTanah ? Prisma.sql`AND t."jenisTanah" = ${inParams.jenisTanah}::"JenisTanah"` : Prisma.empty}
           ${inParams.penggunaan ? Prisma.sql`AND t.penggunaan ILIKE ${'%' + inParams.penggunaan + '%'}` : Prisma.empty}
           ${inParams.status ? Prisma.sql`AND t.status = ${inParams.status}::"StatusData"` : Prisma.empty}
-          ${callerRole === UserRole.OPERATOR ? Prisma.sql`AND t."createdById" = ${callerId}` : Prisma.empty}
+          ${callerRole === 'OPERATOR' ? Prisma.sql`AND t."createdById" = ${callerId}::uuid` : Prisma.empty}
         ORDER BY t."createdAt" DESC
         LIMIT 500
       `;
@@ -169,7 +169,7 @@ export const tkdRouter = createTRPCRouter({
         luasM2: r.luas_m2,
         luasHa: r.luas_ha,
         status: r.status,
-        geometry: JSON.parse(r.geojson) as GeoJSON.Geometry,
+        geometry: r.geojson ? JSON.parse(r.geojson) as GeoJSON.Geometry : null as any,
       }));
     }),
 

@@ -4,7 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { Menu, X, LayoutDashboard, User, LogOut, ChevronDown } from "lucide-react";
+import {
+  Menu,
+  X,
+  LayoutDashboard,
+  User,
+  LogOut,
+  ChevronDown,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const NAV_LINKS = [
@@ -22,30 +29,38 @@ const ROLE_LABEL: Record<string, string> = {
 
 interface PublicNavbarProps {
   isLoggedIn?: boolean;
-  /** Display name of the logged-in user */
   userName?: string | null;
-  /** Role of the logged-in user */
   userRole?: string | null;
 }
 
-/* ─── Profile Chip (shows when logged in) ─────────── */
+/* ─── Profile Chip ─────────────────────────────────── */
 function ProfileChip({
   name,
   role,
+  compact = false,
 }: {
   name: string;
   role: string;
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     }
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, []);
 
   const initial = name.charAt(0).toUpperCase();
@@ -53,45 +68,40 @@ function ProfileChip({
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
-      {/* Chip button */}
       <button
-        id="profile-chip-btn"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
+        aria-label={compact ? `Menu profil: ${name}` : undefined}
         style={{
           display: "inline-flex",
           alignItems: "center",
-          gap: 10,
-          background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+          gap: compact ? 0 : 10,
+          background:
+            "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
           border: "1.5px solid var(--gold-500)",
           borderRadius: 999,
-          padding: "6px 14px 6px 6px",
+          padding: compact ? 4 : "6px 14px 6px 6px",
           cursor: "pointer",
           transition: "box-shadow .2s, transform .2s",
           boxShadow: "var(--shadow-mid), var(--shadow-inset)",
           color: "var(--cream-100)",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-1px)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 10px 24px rgba(0,0,0,.35), var(--shadow-inset)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.transform = "";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-mid), var(--shadow-inset)";
+          maxWidth: compact ? undefined : 240,
         }}
       >
-        {/* Avatar circle */}
         <span
           aria-hidden="true"
           style={{
-            width: 30, height: 30,
+            width: compact ? 34 : 30,
+            height: compact ? 34 : 30,
             borderRadius: "50%",
-            background: "linear-gradient(135deg, var(--gold-500), var(--gold-600))",
-            display: "grid", placeItems: "center",
+            background:
+              "linear-gradient(135deg, var(--gold-500), var(--gold-600))",
+            display: "grid",
+            placeItems: "center",
             fontFamily: '"Cinzel", serif',
             fontWeight: 700,
-            fontSize: 13,
+            fontSize: compact ? 15 : 13,
             color: "#fff9e3",
             flexShrink: 0,
             boxShadow: "0 0 0 2px rgba(214,178,90,.35)",
@@ -100,27 +110,57 @@ function ProfileChip({
           {initial}
         </span>
 
-        {/* Name + role */}
-        <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-          <span style={{ fontFamily: '"Manrope", sans-serif', fontWeight: 600, fontSize: 13, color: "var(--cream-100)", whiteSpace: "nowrap" }}>
-            {name}
-          </span>
-          <span style={{ fontFamily: '"Cinzel", serif', fontSize: 9, letterSpacing: "1.5px", color: "var(--gold-400)", whiteSpace: "nowrap" }}>
-            {roleLabel.toUpperCase()}
-          </span>
-        </span>
+        {!compact && (
+          <>
+            <span
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                lineHeight: 1.2,
+                minWidth: 0,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: '"Manrope", sans-serif',
+                  fontWeight: 600,
+                  fontSize: 13,
+                  color: "var(--cream-100)",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: 140,
+                }}
+              >
+                {name}
+              </span>
+              <span
+                style={{
+                  fontFamily: '"Cinzel", serif',
+                  fontSize: 9,
+                  letterSpacing: "1.5px",
+                  color: "var(--gold-400)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {roleLabel.toUpperCase()}
+              </span>
+            </span>
 
-        <ChevronDown
-          size={14}
-          style={{
-            color: "var(--gold-400)",
-            transform: open ? "rotate(180deg)" : "",
-            transition: "transform .2s",
-          }}
-        />
+            <ChevronDown
+              size={14}
+              style={{
+                color: "var(--gold-400)",
+                transform: open ? "rotate(180deg)" : "",
+                transition: "transform .2s",
+                flexShrink: 0,
+              }}
+            />
+          </>
+        )}
       </button>
 
-      {/* Dropdown */}
       {open && (
         <div
           role="menu"
@@ -128,8 +168,9 @@ function ProfileChip({
             position: "absolute",
             top: "calc(100% + 10px)",
             right: 0,
-            minWidth: 200,
-            background: "linear-gradient(180deg, var(--navy-800), var(--navy-900))",
+            minWidth: 220,
+            background:
+              "linear-gradient(180deg, var(--navy-800), var(--navy-900))",
             border: "1px solid var(--gold-600)",
             borderRadius: 10,
             boxShadow: "var(--shadow-deep)",
@@ -138,19 +179,45 @@ function ProfileChip({
             animation: "fadeUp .18s ease both",
           }}
         >
-          {/* Header */}
-          <div style={{
-            padding: "12px 16px",
-            borderBottom: "1px solid rgba(160,125,47,.3)",
-            fontFamily: '"Cormorant Garamond", serif',
-            fontStyle: "italic",
-            fontSize: 13,
-            color: "var(--cream-200)",
-          }}>
-            Masuk sebagai <strong style={{ color: "var(--gold-400)", fontStyle: "normal" }}>{name}</strong>
+          <div
+            style={{
+              padding: "12px 16px",
+              borderBottom: "1px solid rgba(160,125,47,.3)",
+              fontFamily: '"Cormorant Garamond", serif',
+              fontStyle: "italic",
+              fontSize: 13,
+              color: "var(--cream-200)",
+            }}
+          >
+            Masuk sebagai
+            <strong
+              style={{
+                color: "var(--gold-400)",
+                fontStyle: "normal",
+                display: "block",
+                marginTop: 2,
+                fontFamily: '"Manrope", sans-serif',
+                fontSize: 14,
+                wordBreak: "break-word",
+              }}
+            >
+              {name}
+            </strong>
+            <span
+              style={{
+                display: "block",
+                marginTop: 4,
+                fontFamily: '"Cinzel", serif',
+                fontSize: 9,
+                letterSpacing: "1.5px",
+                color: "var(--gold-400)",
+                fontStyle: "normal",
+              }}
+            >
+              {roleLabel.toUpperCase()}
+            </span>
           </div>
 
-          {/* Menu items */}
           <Link
             href="/admin"
             role="menuitem"
@@ -165,19 +232,10 @@ function ProfileChip({
               letterSpacing: "1.5px",
               color: "var(--cream-100)",
               textDecoration: "none",
-              transition: "background .15s, color .15s",
               borderBottom: "1px solid rgba(160,125,47,.15)",
             }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(214,178,90,.12)";
-              (e.currentTarget as HTMLAnchorElement).style.color = "var(--gold-100)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "";
-              (e.currentTarget as HTMLAnchorElement).style.color = "var(--cream-100)";
-            }}
           >
-            <LayoutDashboard size={14} style={{ color: "var(--gold-400)", flexShrink: 0 }} />
+            <LayoutDashboard size={14} style={{ color: "var(--gold-400)" }} />
             DASHBOARD
           </Link>
 
@@ -195,19 +253,10 @@ function ProfileChip({
               letterSpacing: "1.5px",
               color: "var(--cream-100)",
               textDecoration: "none",
-              transition: "background .15s, color .15s",
               borderBottom: "1px solid rgba(160,125,47,.15)",
             }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(214,178,90,.12)";
-              (e.currentTarget as HTMLAnchorElement).style.color = "var(--gold-100)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLAnchorElement).style.background = "";
-              (e.currentTarget as HTMLAnchorElement).style.color = "var(--cream-100)";
-            }}
           >
-            <User size={14} style={{ color: "var(--gold-400)", flexShrink: 0 }} />
+            <User size={14} style={{ color: "var(--gold-400)" }} />
             PROFIL SAYA
           </Link>
 
@@ -228,16 +277,9 @@ function ProfileChip({
               border: "none",
               cursor: "pointer",
               textAlign: "left",
-              transition: "background .15s",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "rgba(239,154,154,.08)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "";
             }}
           >
-            <LogOut size={14} style={{ color: "#ef9a9a", flexShrink: 0 }} />
+            <LogOut size={14} style={{ color: "#ef9a9a" }} />
             KELUAR
           </button>
         </div>
@@ -255,61 +297,123 @@ export function PublicNavbar({
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    function handler(e: MediaQueryListEvent) {
+      if (e.matches) setMobileOpen(false);
+    }
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [mobileOpen]);
+
   return (
     <header
       style={{
-        background: "linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 55%, var(--navy-900) 100%)",
+        position: "relative",
+        background:
+          "linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 55%, var(--navy-900) 100%)",
+        color: "#f3e9cf",
         borderBottom: "3px solid var(--gold-500)",
         boxShadow: "0 6px 24px rgba(0,0,0,.25)",
-        position: "relative",
-        color: "var(--cream-100)",
       }}
     >
-      {/* Gold shimmer on bottom border */}
+      {/* Gold shimmer (HTML ref: .topbar::before) */}
       <div
         aria-hidden="true"
         style={{
-          position: "absolute", left: 0, right: 0, bottom: -3, height: 3,
-          background: "linear-gradient(90deg, transparent, var(--gold-400) 20%, var(--gold-100) 50%, var(--gold-400) 80%, transparent)",
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: -3,
+          height: 3,
+          background:
+            "linear-gradient(90deg, transparent, var(--gold-400) 20%, var(--gold-100) 50%, var(--gold-400) 80%, transparent)",
           boxShadow: "0 1px 0 rgba(0,0,0,.3)",
         }}
       />
-      {/* Gold glow overlay */}
+      {/* Gold glow (HTML ref: .topbar::after) */}
       <div
         aria-hidden="true"
         style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(600px 120px at 10% 0%, rgba(214,178,90,.15), transparent 60%), radial-gradient(600px 120px at 90% 100%, rgba(214,178,90,.1), transparent 60%)",
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          background:
+            "radial-gradient(600px 120px at 10% 0%, rgba(214,178,90,.15), transparent 60%), radial-gradient(600px 120px at 90% 100%, rgba(214,178,90,.1), transparent 60%)",
         }}
       />
 
-      <div
-        style={{
-          position: "relative",
-          display: "grid",
-          gridTemplateColumns: "auto 1fr auto",
-          gap: 28,
-          alignItems: "center",
-          maxWidth: 1400,
-          margin: "0 auto",
-          padding: "18px 48px 22px",
-        }}
-        className="max-[960px]:grid-cols-1 max-[960px]:text-center max-[960px]:px-5"
-      >
-        {/* Brand / Logo */}
-        <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-          <Image src="/icon.PNG" alt="Lambang Bantul" width={72} height={96} priority />
+      <div className="relative max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-3 sm:py-4 lg:pt-[18px] lg:pb-[22px] flex items-center justify-between gap-3 lg:grid lg:grid-cols-[auto_1fr_auto] lg:gap-7">
+        {/* ─── Brand (.brand) ─────────────────────────
+            Desktop: column (icon + wordmark stacked)
+            Mobile:  row (icon + text label) */}
+        <Link
+          href="/"
+          className="flex items-center lg:flex-col lg:items-center gap-2 sm:gap-3 lg:gap-0 min-w-0 shrink-0"
+          style={{ textDecoration: "none" }}
+        >
+          <Image
+            src="/icon.PNG"
+            alt="Lambang Bantul"
+            width={90}
+            height={120}
+            priority
+            className="w-[40px] h-auto sm:w-[48px] lg:w-[90px] lg:h-[120px] shrink-0 "
+          />
+
+          {/* Desktop wordmark (.brand .text) — exact ref sizing */}
           <Image
             src="/text.PNG"
             alt="Kalurahan Sitimulyo"
-            width={120}
-            height={40}
-            style={{ filter: "invert(1)", marginTop: 4 }}
+            width={150}
+            height={50}
+            style={{ filter: "invert(1)" }}
+            className="hidden lg:block lg:w-[150px] lg:h-[50px] lg:mt-1"
           />
-        </div>
 
-        {/* Title */}
-        <div style={{ textAlign: "center", padding: "0 20px" }}>
+          {/* Mobile/tablet wordmark text */}
+          <div className="block lg:hidden text-left min-w-0">
+            <div
+              style={{
+                fontFamily: '"Cinzel", serif',
+                fontWeight: 800,
+                color: "#fff9e3",
+                lineHeight: 1,
+                letterSpacing: 0.5,
+              }}
+              className="text-lg sm:text-xl truncate"
+            >
+              SI-TKDes
+            </div>
+            <div
+              style={{
+                fontFamily: '"Cormorant Garamond", serif',
+                fontStyle: "italic",
+                color: "var(--gold-400)",
+                marginTop: 3,
+              }}
+              className="text-[11px] sm:text-xs truncate"
+            >
+              Kalurahan Sitimulyo
+            </div>
+          </div>
+        </Link>
+
+        {/* ─── Center title (.title-block) — desktop only ─── */}
+        <div
+          style={{ textAlign: "center", padding: "0 20px" }}
+          className="hidden lg:block"
+        >
           <div
             style={{
               fontFamily: '"Cinzel", serif',
@@ -317,7 +421,8 @@ export function PublicNavbar({
               fontWeight: 800,
               color: "#fff9e3",
               letterSpacing: 1,
-              textShadow: "0 2px 0 rgba(0,0,0,.4), 0 0 24px rgba(214,178,90,.15)",
+              textShadow:
+                "0 2px 0 rgba(0,0,0,.4), 0 0 24px rgba(214,178,90,.15)",
               lineHeight: 1,
             }}
           >
@@ -350,123 +455,253 @@ export function PublicNavbar({
           </div>
         </div>
 
-        {/* Nav + Auth */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 14 }}
-          className="max-[960px]:items-center"
-        >
-          {/* Logged-in: profile chip, logged-out: login link */}
-          {isLoggedIn && userName ? (
-            <ProfileChip name={userName} role={userRole ?? "PUBLIC"} />
-          ) : (
-            <Link
-              href="/login"
-              style={{
-                fontFamily: '"Cormorant Garamond", serif',
-                fontStyle: "italic",
-                fontSize: 18,
-                color: "var(--cream-100)",
-                textDecoration: "none",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                transition: "color .25s",
-              }}
-              className="hover:text-[var(--gold-400)] group"
-            >
-              Log in{" "}
-              <span style={{ transition: "transform .25s" }} className="group-hover:translate-x-1 inline-block">
-                →
-              </span>
-            </Link>
-          )}
+        {/* ─── Right column (.nav-wrap) ──────────────
+            Desktop: column, end-aligned, gap 14
+              row 1: login link OR profile chip
+              row 2: nav buttons (.nav)
+            Mobile: row (compact chip + burger) */}
+<div className="flex items-center gap-2 sm:gap-3 lg:flex-col lg:items-end lg:gap-[14px] shrink-0">
 
-          {/* Desktop nav */}
-          <nav style={{ display: "flex", gap: 14 }} className="max-[600px]:hidden">
-            {NAV_LINKS.map((link) => (
+          {/* Desktop top row */}
+          <div className="hidden lg:block">
+            {isLoggedIn && userName ? (
+              <ProfileChip name={userName} role={userRole ?? "PUBLIC"} />
+            ) : (
               <Link
-                key={link.href}
-                href={link.href}
+                href="/login"
+                className="group"
                 style={{
-                  fontFamily: '"Cinzel", serif',
-                  fontWeight: 600,
-                  fontSize: 13,
-                  letterSpacing: "1.5px",
-                  color: pathname === link.href ? "var(--gold-100)" : "var(--cream-100)",
-                  background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
-                  border: "1px solid var(--gold-600)",
-                  padding: "10px 20px",
-                  borderRadius: 40,
+                  fontFamily: '"Cormorant Garamond", serif',
+                  fontStyle: "italic",
+                  fontSize: 18,
+                  color: "var(--cream-100)",
                   textDecoration: "none",
-                  position: "relative",
-                  boxShadow: "var(--shadow-mid), var(--shadow-inset)",
-                  transition: "transform .2s, box-shadow .2s, color .2s",
-                  display: "inline-block",
-                  whiteSpace: "nowrap",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  transition: "color .25s",
                 }}
               >
-                {link.label}
-                {pathname === link.href && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: 20, right: 20, bottom: 6,
-                      height: 1.5,
-                      background: "linear-gradient(90deg, transparent, var(--gold-400), transparent)",
-                      display: "block",
-                    }}
-                  />
-                )}
+                <span className="group-hover:text-[var(--gold-400)] transition-colors">
+                  Log in
+                </span>
+                <span
+                  className="group-hover:translate-x-1 inline-block"
+                  style={{ transition: "transform .25s" }}
+                >
+                  →
+                </span>
               </Link>
-            ))}
+            )}
+          </div>
+
+          {/* Desktop nav buttons (.nav) — gap:14, padding:10px 26px */}
+          <nav className="hidden lg:flex" style={{ gap: 14 }}>
+            {NAV_LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  style={{
+                    fontFamily: '"Cinzel", serif',
+                    fontWeight: 600,
+                    fontSize: 13,
+                    letterSpacing: "1.5px",
+                    color: active ? "var(--gold-100)" : "var(--cream-100)",
+                    background:
+                      "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+                    border: "1px solid var(--gold-600)",
+                    padding: "10px 26px",
+                    borderRadius: 40,
+                    textDecoration: "none",
+                    position: "relative",
+                    boxShadow: "var(--shadow-mid), var(--shadow-inset)",
+                    transition: "transform .2s, box-shadow .2s, color .2s",
+                    display: "inline-block",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {link.label}
+                  {active && (
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        left: 26,
+                        right: 26,
+                        bottom: 6,
+                        height: 1.5,
+                        background:
+                          "linear-gradient(90deg, transparent, var(--gold-400), transparent)",
+                        display: "block",
+                      }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
+
+          {/* Mobile/tablet auth (compact) */}
+          <div className="lg:hidden">
+            {isLoggedIn && userName ? (
+              <ProfileChip
+                name={userName}
+                role={userRole ?? "PUBLIC"}
+                compact
+              />
+            ) : (
+              <Link
+                href="/login"
+                style={{
+                  fontFamily: '"Cormorant Garamond", serif',
+                  fontStyle: "italic",
+                  color: "var(--cream-100)",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  whiteSpace: "nowrap",
+                }}
+                className="text-sm sm:text-base"
+              >
+                Log in
+                <span>→</span>
+              </Link>
+            )}
+          </div>
 
           {/* Mobile burger */}
           <button
-            className="hidden max-[600px]:block"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            style={{ background: "none", border: "none", color: "var(--cream-100)", cursor: "pointer" }}
-            aria-label="Toggle menu"
+            className="block lg:hidden text-[var(--cream-100)] cursor-pointer bg-transparent border-none p-1.5 sm:p-2 rounded-md"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* ─── Mobile menu ───────────────────────────── */}
       {mobileOpen && (
         <div
+          className="lg:hidden"
           style={{
             background: "var(--navy-900)",
             borderTop: "1px solid var(--gold-600)",
-            padding: "12px 20px 20px",
+            padding: "14px 16px 20px",
             display: "flex",
             flexDirection: "column",
             gap: 8,
+            maxHeight: "calc(100vh - 70px)",
+            overflowY: "auto",
           }}
         >
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
+          {isLoggedIn && userName && (
+            <div
               style={{
-                fontFamily: '"Cinzel", serif',
-                fontWeight: 600,
-                fontSize: 13,
-                letterSpacing: "1.5px",
-                color: "var(--cream-100)",
-                padding: "10px 16px",
-                borderRadius: 8,
-                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "12px 14px",
+                marginBottom: 4,
+                borderRadius: 10,
                 border: "1px solid var(--gold-600)",
-                background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+                background:
+                  "linear-gradient(180deg, var(--navy-800), var(--navy-900))",
               }}
             >
-              {link.label}
-            </Link>
-          ))}
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: "50%",
+                  background:
+                    "linear-gradient(135deg, var(--gold-500), var(--gold-600))",
+                  display: "grid",
+                  placeItems: "center",
+                  fontFamily: '"Cinzel", serif',
+                  fontWeight: 700,
+                  fontSize: 16,
+                  color: "#fff9e3",
+                  flexShrink: 0,
+                  boxShadow: "0 0 0 2px rgba(214,178,90,.35)",
+                }}
+              >
+                {userName.charAt(0).toUpperCase()}
+              </span>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div
+                  style={{
+                    fontFamily: '"Manrope", sans-serif',
+                    fontWeight: 600,
+                    fontSize: 14,
+                    color: "var(--cream-100)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {userName}
+                </div>
+                <div
+                  style={{
+                    fontFamily: '"Cinzel", serif',
+                    fontSize: 9,
+                    letterSpacing: "1.5px",
+                    color: "var(--gold-400)",
+                    marginTop: 2,
+                  }}
+                >
+                  {(ROLE_LABEL[userRole ?? "PUBLIC"] ?? "Publik").toUpperCase()}
+                </div>
+              </div>
+            </div>
+          )}
 
-          {/* Mobile auth row */}
+          {NAV_LINKS.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  fontFamily: '"Cinzel", serif',
+                  fontWeight: 600,
+                  fontSize: 13,
+                  letterSpacing: "1.5px",
+                  color: active ? "var(--gold-100)" : "var(--cream-100)",
+                  padding: "12px 26px",
+                  borderRadius: 40,
+                  textDecoration: "none",
+                  border: active
+                    ? "1.5px solid var(--gold-500)"
+                    : "1px solid var(--gold-600)",
+                  background:
+                    "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+                  boxShadow: "var(--shadow-mid), var(--shadow-inset)",
+                  textAlign: "center",
+                }}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+
+          <div
+            aria-hidden="true"
+            style={{
+              height: 1,
+              margin: "8px 0 4px",
+              background:
+                "linear-gradient(90deg, transparent, rgba(214,178,90,.4), transparent)",
+            }}
+          />
+
           {isLoggedIn ? (
             <>
               <Link
@@ -478,14 +713,15 @@ export function PublicNavbar({
                   fontSize: 13,
                   letterSpacing: "1.5px",
                   color: "var(--gold-100)",
-                  padding: "10px 16px",
+                  padding: "12px 16px",
                   borderRadius: 8,
                   textDecoration: "none",
                   border: "1.5px solid var(--gold-500)",
-                  background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+                  background:
+                    "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
                   display: "flex",
                   alignItems: "center",
-                  gap: 8,
+                  gap: 10,
                 }}
               >
                 <LayoutDashboard size={14} />
@@ -500,19 +736,47 @@ export function PublicNavbar({
                   fontSize: 13,
                   letterSpacing: "1.5px",
                   color: "var(--cream-100)",
-                  padding: "10px 16px",
+                  padding: "12px 16px",
                   borderRadius: 8,
                   textDecoration: "none",
                   border: "1px solid var(--gold-600)",
-                  background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+                  background:
+                    "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
                   display: "flex",
                   alignItems: "center",
-                  gap: 8,
+                  gap: 10,
                 }}
               >
                 <User size={14} />
                 PROFIL SAYA
               </Link>
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  signOut({ callbackUrl: "/" });
+                }}
+                style={{
+                  fontFamily: '"Cinzel", serif',
+                  fontWeight: 600,
+                  fontSize: 13,
+                  letterSpacing: "1.5px",
+                  color: "#ef9a9a",
+                  padding: "12px 16px",
+                  borderRadius: 8,
+                  border: "1px solid rgba(239, 154, 154, 0.4)",
+                  background:
+                    "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  cursor: "pointer",
+                  width: "100%",
+                  textAlign: "left",
+                }}
+              >
+                <LogOut size={14} />
+                KELUAR
+              </button>
             </>
           ) : (
             <Link
@@ -524,11 +788,13 @@ export function PublicNavbar({
                 fontSize: 13,
                 letterSpacing: "1.5px",
                 color: "var(--gold-100)",
-                padding: "10px 16px",
+                padding: "12px 16px",
                 borderRadius: 8,
                 textDecoration: "none",
                 border: "1.5px solid var(--gold-500)",
-                background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+                background:
+                  "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+                textAlign: "center",
               }}
             >
               LOG IN →

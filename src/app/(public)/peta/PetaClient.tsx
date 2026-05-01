@@ -39,10 +39,13 @@ export function PetaClient({
   });
 
   return (
-    <div className="rounded-xl overflow-hidden border-2 border-[var(--gold-500)]/30 bg-white shadow-xl animate-fadeUp h-[600px] sm:h-[700px]" style={{ display: "flex" }}>
+    <div
+      className="rounded-xl overflow-hidden gap-2 border-2 border-[var(--gold-500)]/30 shadow-xl animate-fadeUp h-[900px] sm:h-[700px] max-[768px]:flex-col"
+      style={{ display: "flex" }}
+    >
       {/* Sidebar Filter */}
       <div
-        className="card-heritage"
+        className="card-heritage max-[768px]:w-full"
         style={{
           width: 320,
           flexShrink: 0,
