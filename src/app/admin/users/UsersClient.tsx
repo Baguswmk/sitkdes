@@ -127,6 +127,15 @@ export function UsersClient({
     setIsRefreshing(false);
   };
 
+  const generateDefaultPassword = () => {
+    const prefix = process.env.NEXT_PUBLIC_DEFAULT_PASSWORD_PREFIX || "Sitimulyo";
+    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const date = new Date();
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${prefix}@${month}${year}!`;
+  };
+
   const openCreateModal = () => {
     setFormData({
       name: "",
@@ -134,7 +143,7 @@ export function UsersClient({
       email: "",
       role: UserRole.OPERATOR,
       status: UserStatus.ACTIVE,
-      password: "",
+      password: generateDefaultPassword(),
     });
     setIsCreateOpen(true);
   };
@@ -154,7 +163,7 @@ export function UsersClient({
 
   const openResetModal = (user: UserWithCounts) => {
     setSelectedUser(user);
-    setResetPasswordInput("");
+    setResetPasswordInput(generateDefaultPassword());
     setIsResetOpen(true);
   };
 
@@ -239,10 +248,10 @@ export function UsersClient({
           </button>
           <button
             onClick={openCreateModal}
-            className="btn-heritage"
-            style={{ display: "flex", alignItems: "center", gap: 8 }}
+            className="btn-heritage flex items-center gap-2"
           >
-            <Plus size={16} /> TAMBAH PENGGUNA
+            <Plus size={16} />
+            <span className="hidden sm:inline">Tambah Pengguna</span>
           </button>
         </div>
       </div>
@@ -532,16 +541,29 @@ export function UsersClient({
               <label className="label-heritage">
                 Password Awal <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                required
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                className="input-heritage"
-                placeholder="Minimal 8 karakter"
-              />
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="text"
+                  required
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className="input-heritage"
+                  placeholder="Minimal 8 karakter"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(formData.password);
+                    toast.success("Password disalin!");
+                  }}
+                  className="btn-heritage-pill"
+                  style={{ padding: "0 16px", fontSize: 12, letterSpacing: 1 }}
+                >
+                  Salin
+                </button>
+              </div>
               <p
                 style={{
                   fontSize: 11,
@@ -550,8 +572,8 @@ export function UsersClient({
                   fontStyle: "italic",
                 }}
               >
-                Pengguna akan diminta mengganti password ini saat login pertama
-                kali.
+                Pengguna akan diminta mengganti password ini saat login pertama kali.
+                <br />(Otomatis menggunakan format default bulan ini).
               </p>
             </div>
           </form>
@@ -781,14 +803,37 @@ export function UsersClient({
             <label className="label-heritage">
               Password Baru <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              required
-              value={resetPasswordInput}
-              onChange={(e) => setResetPasswordInput(e.target.value)}
-              className="input-heritage"
-              placeholder="Masukkan password baru"
-            />
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="text"
+                required
+                value={resetPasswordInput}
+                onChange={(e) => setResetPasswordInput(e.target.value)}
+                className="input-heritage"
+                placeholder="Masukkan password baru"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(resetPasswordInput);
+                  toast.success("Password disalin!");
+                }}
+                className="btn-heritage-pill"
+                style={{ padding: "0 16px", fontSize: 12, letterSpacing: 1 }}
+              >
+                Salin
+              </button>
+            </div>
+            <p
+              style={{
+                fontSize: 11,
+                color: "var(--ink-soft)",
+                marginTop: 4,
+                fontStyle: "italic",
+              }}
+            >
+              (Otomatis menggunakan format default bulan ini).
+            </p>
           </form>
           <div
             style={{
