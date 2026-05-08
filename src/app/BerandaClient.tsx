@@ -32,11 +32,13 @@ const JENIS_LABEL: Record<string, string> = {
   LAINNYA: "Lainnya",
 };
 
-export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
+export function BerandaClient() {
   const { data: stats } = trpc.stats.public.useQuery();
   const { data: tkdList, isLoading: loadingMap } = trpc.tkd.listPublic.useQuery(
     {},
   );
+  const { data: padukuhanList, isLoading: loadingPadukuhan } =
+    trpc.padukuhan.list.useQuery();
 
   return (
     <div className="animate-fadeUp">
@@ -211,7 +213,7 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
 
         {/* Padukuhan table */}
         <div className="card-heritage" style={{ overflow: "hidden" }}>
-          <div style={{ maxHeight: 380, overflowY: "auto" }}>
+          <div style={{ maxHeight: 500, overflowY: "auto" }}>
             <table className="tbl-heritage">
               <thead>
                 <tr>
@@ -220,14 +222,22 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
                 </tr>
               </thead>
               <tbody>
-                {padukuhanList.map((nama, i) => (
-                  <tr key={nama}>
-                    <td>{i + 1}</td>
-                    <td style={{ textAlign: "left", paddingLeft: 18 }}>
-                      {nama}
+                {loadingPadukuhan ? (
+                  <tr>
+                    <td colSpan={2} style={{ textAlign: "center", fontStyle: "italic", color: "var(--ink-soft)" }}>
+                      Memuat data...
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  (padukuhanList ?? []).map((p, i) => (
+                    <tr key={p.id}>
+                      <td>{i + 1}</td>
+                      <td style={{ textAlign: "left", paddingLeft: 18 }}>
+                        {p.nama}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

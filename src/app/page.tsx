@@ -10,23 +10,6 @@ export const metadata: Metadata = {
     "Sistem Informasi Tanah Kalurahan Sitimulyo — Peta interaktif dan data geospasial tanah kas desa.",
 };
 
-const PADUKUHAN_LIST = [
-  "Babadan",
-  "Karanganom",
-  "Karang Tengah",
-  "Mojosari",
-  "Karangploso",
-  "Nglengis",
-  "Somokaton",
-  "Mutihan",
-  "Ngampon",
-  "Banyakan I",
-  "Banyakan II",
-  "Banyakan III",
-  "Pagergunung I",
-  "Pagergunung II",
-];
-
 export default async function BerandaPage() {
   const session = await auth();
 
@@ -49,7 +32,7 @@ export default async function BerandaPage() {
         }}
         className="max-[960px]:px-5 max-[960px]:py-7"
       >
-        <BerandaClient padukuhanList={PADUKUHAN_LIST} />
+        <BerandaClient />
       </main>
       <Footer />
     </div>
