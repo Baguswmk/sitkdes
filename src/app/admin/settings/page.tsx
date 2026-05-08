@@ -7,8 +7,8 @@ import { db } from "@/lib/db/client";
 import { SettingsClient } from "./SettingsClient";
 
 export const metadata: Metadata = {
-  title: "Pengaturan Sistem - Admin SI-TKDes",
-  description: "Konfigurasi sistem SI-TKDes",
+  title: "Pengaturan Sistem - Admin SI-TAKAL",
+  description: "Konfigurasi sistem SI-TAKAL",
 };
 
 export default async function SettingsPage() {

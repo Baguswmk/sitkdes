@@ -9,7 +9,22 @@ import type { Metadata } from "next";
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div style={{ textAlign: "center", padding: 40, fontFamily: 'var(--font-cormorant)', fontSize: 18, fontStyle: "italic", color: "var(--ink-soft)" }}>Memuat form login...</div>}>
+    <Suspense
+      fallback={
+        <div
+          style={{
+            textAlign: "center",
+            padding: 40,
+            fontFamily: "var(--font-cormorant)",
+            fontSize: 18,
+            fontStyle: "italic",
+            color: "var(--ink-soft)",
+          }}
+        >
+          Memuat form login...
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );
@@ -41,7 +56,9 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        toast.error("Username atau password salah. Periksa kembali kredensial Anda.");
+        toast.error(
+          "Username atau password salah. Periksa kembali kredensial Anda.",
+        );
       } else {
         toast.success("Login berhasil! Mengalihkan...");
         router.push(callbackUrl);
@@ -93,20 +110,28 @@ function LoginForm() {
               marginTop: 6,
             }}
           >
-            SI-TKDes Kalurahan Sitimulyo
+            SI-TAKAL Kalurahan Sitimulyo
           </div>
           <div
             style={{
               margin: "16px auto 0",
               height: 1,
-              background: "linear-gradient(90deg, transparent, var(--gold-500) 20%, var(--gold-400) 50%, var(--gold-500) 80%, transparent)",
+              background:
+                "linear-gradient(90deg, transparent, var(--gold-500) 20%, var(--gold-400) 50%, var(--gold-500) 80%, transparent)",
               maxWidth: 280,
             }}
           />
-          <div style={{ color: "var(--gold-500)", fontSize: 16, marginTop: -8 }}>❦</div>
+          <div
+            style={{ color: "var(--gold-500)", fontSize: 16, marginTop: -8 }}
+          >
+            ❦
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: 20 }}
+        >
           {/* Username */}
           <div>
             <label htmlFor="username" className="label-heritage">
@@ -159,7 +184,9 @@ function LoginForm() {
                   display: "flex",
                   alignItems: "center",
                 }}
-                aria-label={showPass ? "Sembunyikan password" : "Tampilkan password"}
+                aria-label={
+                  showPass ? "Sembunyikan password" : "Tampilkan password"
+                }
               >
                 {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -189,7 +216,8 @@ function LoginForm() {
               <>
                 <span
                   style={{
-                    width: 16, height: 16,
+                    width: 16,
+                    height: 16,
                     border: "2px solid rgba(255,255,255,.3)",
                     borderTopColor: "var(--gold-400)",
                     borderRadius: "50%",

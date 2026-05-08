@@ -393,7 +393,7 @@ export function PublicNavbar({
               }}
               className="text-lg sm:text-xl truncate"
             >
-              SI-TKDes
+              SI-TAKAL
             </div>
             <div
               style={{
@@ -426,7 +426,7 @@ export function PublicNavbar({
               lineHeight: 1,
             }}
           >
-            SI-TKDes
+            SI-TAKAL
           </div>
           <div
             style={{
@@ -438,7 +438,7 @@ export function PublicNavbar({
               marginTop: 6,
             }}
           >
-            SISTEM INFORMASI TANAH KAS DESA
+            SISTEM INFORMASI TANAH KALURAHAN
           </div>
           <div
             style={{
@@ -460,8 +460,7 @@ export function PublicNavbar({
               row 1: login link OR profile chip
               row 2: nav buttons (.nav)
             Mobile: row (compact chip + burger) */}
-<div className="flex items-center gap-2 sm:gap-3 lg:flex-col lg:items-end lg:gap-[14px] shrink-0">
-
+        <div className="flex items-center gap-2 sm:gap-3 lg:flex-col lg:items-end lg:gap-[14px] shrink-0">
           {/* Desktop top row */}
           <div className="hidden lg:block">
             {isLoggedIn && userName ? (

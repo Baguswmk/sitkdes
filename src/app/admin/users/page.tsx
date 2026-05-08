@@ -7,8 +7,8 @@ import { db } from "@/lib/db/client";
 import { UsersClient } from "./UsersClient";
 
 export const metadata: Metadata = {
-  title: "Kelola User - Admin SI-TKDes",
-  description: "Manajemen pengguna aplikasi SI-TKDes",
+  title: "Kelola User - Admin SI-TAKAL",
+  description: "Manajemen pengguna aplikasi SI-TAKAL",
 };
 
 export default async function UsersPage() {
@@ -26,5 +26,7 @@ export default async function UsersPage() {
   // Fetch initial data
   const initialData = await caller.users.list();
 
-  return <UsersClient initialData={initialData} currentUserId={session.user.id} />;
+  return (
+    <UsersClient initialData={initialData} currentUserId={session.user.id} />
+  );
 }

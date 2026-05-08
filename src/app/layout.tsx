@@ -5,12 +5,19 @@ import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | SI-TKDes Sitimulyo",
-    default: "SI-TKDes — Sistem Informasi Tanah Kas Desa Sitimulyo",
+    template: "%s | SI-TAKAL Sitimulyo",
+    default: "SI-TAKAL — Sistem Informasi Tanah Sitimulyo",
   },
   description:
     "Sistem Informasi Geospasial Tanah Kas Desa Kalurahan Sitimulyo, Kapanewon Piyungan, Kabupaten Bantul",
-  keywords: ["tanah kas desa", "sitimulyo", "piyungan", "bantul", "GIS", "pemetaan"],
+  keywords: [
+    "tanah kas desa",
+    "sitimulyo",
+    "piyungan",
+    "bantul",
+    "GIS",
+    "pemetaan",
+  ],
 };
 
 export default function RootLayout({

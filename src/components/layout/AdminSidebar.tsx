@@ -89,7 +89,7 @@ export function AdminSidebar({ userName, userRole, userEmail }: Props) {
         <Image src="/icon.PNG" alt="Logo" width={40} height={54} />
         <div>
           <div style={{ fontFamily: '"Cinzel", serif', fontSize: 15, fontWeight: 800, color: "#fff9e3", letterSpacing: 1 }}>
-            SI-TKDes
+            SI-TAKAL
           </div>
           <div style={{ fontFamily: '"Cinzel", serif', fontSize: 7.5, letterSpacing: 2, color: "var(--gold-400)", marginTop: 1 }}>
             ADMIN PANEL

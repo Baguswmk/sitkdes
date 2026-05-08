@@ -7,7 +7,19 @@ import { trpc } from "@/lib/trpc/client";
 const MapViewer = dynamic(() => import("@/components/map/MapViewer"), {
   ssr: false,
   loading: () => (
-    <div style={{ width: "100%", height: "100%", background: "var(--cream-100)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--navy-800)", fontStyle: "italic", fontSize: 14 }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        background: "var(--cream-100)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "var(--navy-800)",
+        fontStyle: "italic",
+        fontSize: 14,
+      }}
+    >
       Memuat Peta...
     </div>
   ),
@@ -22,8 +34,9 @@ const JENIS_LABEL: Record<string, string> = {
 
 export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
   const { data: stats } = trpc.stats.public.useQuery();
-  const { data: tkdList, isLoading: loadingMap } = trpc.tkd.listPublic.useQuery({});
-
+  const { data: tkdList, isLoading: loadingMap } = trpc.tkd.listPublic.useQuery(
+    {},
+  );
 
   return (
     <div className="animate-fadeUp">
@@ -41,10 +54,17 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
             marginBottom: 8,
           }}
         >
-          SI-TKDes
+          SI-TAKAL
         </h1>
-        <p style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: "italic", fontSize: 20, color: "var(--ink-soft)" }}>
-          Sistem Informasi Tanah Kas Desa Kalurahan Sitimulyo
+        <p
+          style={{
+            fontFamily: '"Cormorant Garamond", serif',
+            fontStyle: "italic",
+            fontSize: 20,
+            color: "var(--ink-soft)",
+          }}
+        >
+          Sistem Informasi Tanah Kalurahan Sitimulyo
         </p>
       </div>
 
@@ -62,14 +82,22 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
         <Link
           href="/peta"
           className="btn-heritage-pill"
-          style={{ display: "block", textAlign: "center", textDecoration: "none" }}
+          style={{
+            display: "block",
+            textAlign: "center",
+            textDecoration: "none",
+          }}
         >
           LIHAT PETA
         </Link>
         <Link
           href="/login"
           className="btn-heritage-pill"
-          style={{ display: "block", textAlign: "center", textDecoration: "none" }}
+          style={{
+            display: "block",
+            textAlign: "center",
+            textDecoration: "none",
+          }}
         >
           LIHAT DATA
         </Link>
@@ -89,11 +117,18 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
           className="max-[600px]:grid-cols-1"
         >
           {[
-            { label: "Total Luas", value: `${stats.totalLuasHa.toFixed(1)} Ha` },
+            {
+              label: "Total Luas",
+              value: `${stats.totalLuasHa.toFixed(1)} Ha`,
+            },
             { label: "Jumlah Bidang", value: `${stats.totalBidang} Bidang` },
             { label: "Padukuhan", value: `${stats.padukuhanCount} Wilayah` },
           ].map((s) => (
-            <div key={s.label} className="stat-card-heritage" style={{ textAlign: "center" }}>
+            <div
+              key={s.label}
+              className="stat-card-heritage"
+              style={{ textAlign: "center" }}
+            >
               <div className="stat-label">{s.label}</div>
               <div
                 style={{
@@ -114,7 +149,13 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
 
       {/* ─── Two-column panels ─── */}
       <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 54, maxWidth: 1200, margin: "0 auto" }}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 54,
+          maxWidth: 1200,
+          margin: "0 auto",
+        }}
         className="max-[960px]:grid-cols-1 max-[960px]:gap-7"
       >
         {/* Map preview */}
@@ -130,7 +171,19 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
             }}
           >
             {loadingMap && (
-              <div style={{ position: "absolute", inset: 0, background: "rgba(250,243,224,.7)", zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 600, color: "var(--navy-800)" }}>
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "rgba(250,243,224,.7)",
+                  zIndex: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 600,
+                  color: "var(--navy-800)",
+                }}
+              >
                 Memuat Data Peta...
               </div>
             )}
@@ -170,7 +223,9 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
                 {padukuhanList.map((nama, i) => (
                   <tr key={nama}>
                     <td>{i + 1}</td>
-                    <td style={{ textAlign: "left", paddingLeft: 18 }}>{nama}</td>
+                    <td style={{ textAlign: "left", paddingLeft: 18 }}>
+                      {nama}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -184,16 +239,44 @@ export function BerandaClient({ padukuhanList }: { padukuhanList: string[] }) {
         <div style={{ marginTop: 44, maxWidth: 900, margin: "44px auto 0" }}>
           <div className="section-title-heritage">SEBARAN JENIS TANAH</div>
           <div
-            style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 18 }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: 18,
+            }}
             className="max-[600px]:grid-cols-2"
           >
             {stats.byJenis.map((j) => (
               <div key={j.jenis} className="stat-card-heritage">
-                <div className="stat-label">{JENIS_LABEL[j.jenis] ?? j.jenis}</div>
-                <div style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 26, fontWeight: 700, color: "var(--navy-900)" }}>
-                  {j.luasHa.toFixed(1)} <span style={{ fontSize: 13, color: "var(--ink-soft)", fontStyle: "italic" }}>Ha</span>
+                <div className="stat-label">
+                  {JENIS_LABEL[j.jenis] ?? j.jenis}
                 </div>
-                <div style={{ fontSize: 13, color: "var(--ink-soft)", fontStyle: "italic" }}>
+                <div
+                  style={{
+                    fontFamily: '"Cormorant Garamond", serif',
+                    fontSize: 26,
+                    fontWeight: 700,
+                    color: "var(--navy-900)",
+                  }}
+                >
+                  {j.luasHa.toFixed(1)}{" "}
+                  <span
+                    style={{
+                      fontSize: 13,
+                      color: "var(--ink-soft)",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    Ha
+                  </span>
+                </div>
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: "var(--ink-soft)",
+                    fontStyle: "italic",
+                  }}
+                >
                   {j.count} bidang
                 </div>
               </div>

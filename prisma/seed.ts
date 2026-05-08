@@ -4,37 +4,87 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const PADUKUHAN_DATA = [
-  { nama: "Babadan",        kode: "BB",  urutan: 1 },
-  { nama: "Karanganom",     kode: "KA",  urutan: 2 },
-  { nama: "Karang Tengah",  kode: "KT",  urutan: 3 },
-  { nama: "Mojosari",       kode: "MS",  urutan: 4 },
-  { nama: "Karangploso",    kode: "KP",  urutan: 5 },
-  { nama: "Nglengis",       kode: "NL",  urutan: 6 },
-  { nama: "Somokaton",      kode: "SK",  urutan: 7 },
-  { nama: "Mutihan",        kode: "MT",  urutan: 8 },
-  { nama: "Ngampon",        kode: "NA",  urutan: 9 },
-  { nama: "Banyakan I",     kode: "B1",  urutan: 10 },
-  { nama: "Banyakan II",    kode: "B2",  urutan: 11 },
-  { nama: "Banyakan III",   kode: "B3",  urutan: 12 },
-  { nama: "Pagergunung I",  kode: "PG1", urutan: 13 },
+  { nama: "Babadan", kode: "BB", urutan: 1 },
+  { nama: "Karanganom", kode: "KA", urutan: 2 },
+  { nama: "Karang Tengah", kode: "KT", urutan: 3 },
+  { nama: "Mojosari", kode: "MS", urutan: 4 },
+  { nama: "Karangploso", kode: "KP", urutan: 5 },
+  { nama: "Nglengis", kode: "NL", urutan: 6 },
+  { nama: "Somokaton", kode: "SK", urutan: 7 },
+  { nama: "Mutihan", kode: "MT", urutan: 8 },
+  { nama: "Ngampon", kode: "NA", urutan: 9 },
+  { nama: "Banyakan I", kode: "B1", urutan: 10 },
+  { nama: "Banyakan II", kode: "B2", urutan: 11 },
+  { nama: "Banyakan III", kode: "B3", urutan: 12 },
+  { nama: "Pagergunung I", kode: "PG1", urutan: 13 },
   { nama: "Pagergunung II", kode: "PG2", urutan: 14 },
 ];
 
 const SYSTEM_CONFIGS = [
-  { key: "password.expiry_days",        value: 30,   description: "Jumlah hari sampai password kedaluwarsa",         category: "security" },
-  { key: "password.history_count",      value: 5,    description: "Jumlah password lama yang tidak boleh digunakan", category: "security" },
-  { key: "password.min_length",         value: 12,   description: "Panjang minimum password",                        category: "security" },
-  { key: "password.require_uppercase",  value: true, description: "Password wajib huruf kapital",                    category: "security" },
-  { key: "password.require_number",     value: true, description: "Password wajib angka",                            category: "security" },
-  { key: "password.require_symbol",     value: true, description: "Password wajib simbol",                           category: "security" },
-  { key: "security.max_login_attempts", value: 5,    description: "Maksimal percobaan login sebelum dikunci",         category: "security" },
-  { key: "security.lockout_minutes",    value: 15,   description: "Durasi kunci akun (menit)",                       category: "security" },
-  { key: "email.from",                  value: "noreply@sitimulyo.desa.id", description: "Alamat email pengirim",    category: "email" },
-  { key: "app.name",                    value: "SI-TKDes Sitimulyo",        description: "Nama aplikasi",           category: "general" },
+  {
+    key: "password.expiry_days",
+    value: 30,
+    description: "Jumlah hari sampai password kedaluwarsa",
+    category: "security",
+  },
+  {
+    key: "password.history_count",
+    value: 5,
+    description: "Jumlah password lama yang tidak boleh digunakan",
+    category: "security",
+  },
+  {
+    key: "password.min_length",
+    value: 12,
+    description: "Panjang minimum password",
+    category: "security",
+  },
+  {
+    key: "password.require_uppercase",
+    value: true,
+    description: "Password wajib huruf kapital",
+    category: "security",
+  },
+  {
+    key: "password.require_number",
+    value: true,
+    description: "Password wajib angka",
+    category: "security",
+  },
+  {
+    key: "password.require_symbol",
+    value: true,
+    description: "Password wajib simbol",
+    category: "security",
+  },
+  {
+    key: "security.max_login_attempts",
+    value: 5,
+    description: "Maksimal percobaan login sebelum dikunci",
+    category: "security",
+  },
+  {
+    key: "security.lockout_minutes",
+    value: 15,
+    description: "Durasi kunci akun (menit)",
+    category: "security",
+  },
+  {
+    key: "email.from",
+    value: "noreply@sitimulyo.desa.id",
+    description: "Alamat email pengirim",
+    category: "email",
+  },
+  {
+    key: "app.name",
+    value: "SI-TAKAL Sitimulyo",
+    description: "Nama aplikasi",
+    category: "general",
+  },
 ];
 
 async function main() {
-  console.log("🌱 Seeding database SI-TKDes...\n");
+  console.log("🌱 Seeding database SI-TAKAL...\n");
 
   // ── 1. Padukuhan ──────────────────────────────────────────────────────────
   console.log("📍 Membuat padukuhan...");

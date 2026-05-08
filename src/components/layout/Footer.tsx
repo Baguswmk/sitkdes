@@ -2,7 +2,8 @@ export function Footer() {
   return (
     <footer
       style={{
-        background: "linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%)",
+        background:
+          "linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%)",
         color: "var(--cream-100)",
         textAlign: "center",
         padding: "22px 32px 24px",
@@ -16,8 +17,12 @@ export function Footer() {
         aria-hidden="true"
         style={{
           position: "absolute",
-          top: -3, left: 0, right: 0, height: 3,
-          background: "linear-gradient(90deg, transparent, var(--gold-400) 20%, var(--gold-100) 50%, var(--gold-400) 80%, transparent)",
+          top: -3,
+          left: 0,
+          right: 0,
+          height: 3,
+          background:
+            "linear-gradient(90deg, transparent, var(--gold-400) 20%, var(--gold-100) 50%, var(--gold-400) 80%, transparent)",
         }}
       />
       <p
@@ -30,7 +35,7 @@ export function Footer() {
           lineHeight: 1.8,
         }}
       >
-        SISTEM INFORMASI TANAH KAS DESA
+        SISTEM INFORMASI TANAH KALURAHAN
       </p>
       <p
         style={{
@@ -41,7 +46,8 @@ export function Footer() {
           lineHeight: 1.8,
         }}
       >
-        KALURAHAN SITIMULYO &nbsp;·&nbsp; KAPANEWON PIYUNGAN &nbsp;·&nbsp; KABUPATEN BANTUL
+        KALURAHAN SITIMULYO &nbsp;·&nbsp; KAPANEWON PIYUNGAN &nbsp;·&nbsp;
+        KABUPATEN BANTUL
       </p>
       <div
         aria-hidden="true"

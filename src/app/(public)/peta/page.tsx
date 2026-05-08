@@ -5,7 +5,7 @@ import { db } from "@/lib/db/client";
 import { PetaClient } from "./PetaClient";
 
 export const metadata: Metadata = {
-  title: "Peta Digital | SI-TKDes Sitimulyo",
+  title: "Peta Digital | SI-TAKAL Sitimulyo",
   description: "Peta interaktif persebaran Tanah Kas Desa Kalurahan Sitimulyo",
 };
 

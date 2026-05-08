@@ -25,7 +25,7 @@ export function AdminLayoutWrapper({ children, user }: Props) {
   }, [pathname]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", position: "relative" }} >
+    <div style={{ display: "flex", minHeight: "100vh", position: "relative" }}>
       {/* Mobile overlay */}
       {isMobileOpen && (
         <div
@@ -80,7 +80,7 @@ export function AdminLayoutWrapper({ children, user }: Props) {
             >
               ❦
             </span>
-            <span>SI-TKDes SITIMULYO</span>
+            <span>SI-TAKAL SITIMULYO</span>
           </div>
         </div>
 
