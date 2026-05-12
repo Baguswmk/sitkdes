@@ -106,12 +106,12 @@ export const padukuhanRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const count = await ctx.db.tanahKasDesa.count({
-        where: { padukuhanId: input.id, deletedAt: null },
+        where: { padukuhanId: input.id },
       });
       if (count > 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `Tidak dapat menghapus padukuhan yang masih memiliki ${count} data TKD`,
+          message: `Tidak dapat menghapus padukuhan yang memiliki ${count} data TKD (termasuk riwayat terhapus). Silakan gunakan opsi Nonaktifkan (Edit -> Nonaktifkan) untuk menyembunyikan padukuhan ini.`,
         });
       }
 
