@@ -5,8 +5,8 @@ import { logActivity, AuditAction } from "@/lib/audit/logger";
 
 const padukuhanInputSchema = z.object({
   nama: z.string().min(1, "Nama padukuhan wajib diisi").max(100),
-  kode: z.string().max(20).optional(),
-  deskripsi: z.string().max(500).optional(),
+  kode: z.preprocess((val) => (val === "" ? null : val), z.string().max(20).nullish()),
+  deskripsi: z.preprocess((val) => (val === "" ? null : val), z.string().max(500).nullish()),
   urutan: z.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
 });
