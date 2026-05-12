@@ -145,10 +145,13 @@ export function TkdListClient({
           <div style={{ position: "relative" }}>
             <input
               type="text"
-              placeholder="Nama / Kode TKD..."
+              placeholder="Nama TKD..."
               className="input-heritage"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
               style={{ paddingLeft: 36 }}
             />
             <Search
@@ -169,7 +172,10 @@ export function TkdListClient({
           <select
             className="select-heritage"
             value={status}
-            onChange={(e) => setStatus(e.target.value as StatusData)}
+            onChange={(e) => {
+              setStatus(e.target.value as StatusData);
+              setPage(1);
+            }}
           >
             <option value="">Semua Status</option>
             <option value="DRAFT">Draft</option>
@@ -184,7 +190,10 @@ export function TkdListClient({
           <select
             className="select-heritage"
             value={jenisTanah}
-            onChange={(e) => setJenisTanah(e.target.value as JenisTanah)}
+            onChange={(e) => {
+              setJenisTanah(e.target.value as JenisTanah);
+              setPage(1);
+            }}
           >
             <option value="">Semua Jenis</option>
             <option value="TANAH_KAS">Tanah Kas</option>
@@ -198,7 +207,10 @@ export function TkdListClient({
           <select
             className="select-heritage"
             value={padukuhanId}
-            onChange={(e) => setPadukuhanId(e.target.value)}
+            onChange={(e) => {
+              setPadukuhanId(e.target.value);
+              setPage(1);
+            }}
           >
             <option value="">Semua Padukuhan</option>
             {padukuhanOptions.map((p) => (
