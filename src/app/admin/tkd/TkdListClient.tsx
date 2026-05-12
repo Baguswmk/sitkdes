@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, Search, Eye, Edit, RefreshCw } from "lucide-react";
+import { Plus, Search, Eye, Edit, RefreshCw, Trash2 } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
 import { Pagination } from "@/components/ui/Pagination";
-import { StatusData, JenisTanah } from "@prisma/client";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { toast } from "sonner";
+import { StatusData, JenisTanah, UserRole } from "@prisma/client";
 
 const STATUS_BADGE: Record<string, string> = {
   DRAFT: "bg-gray-200 text-gray-700",
@@ -21,8 +23,16 @@ const JENIS_LABEL: Record<string, string> = {
   LAINNYA: "Lainnya",
 };
 
-export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: string; nama: string }[] }) {
+export function TkdListClient({
+  padukuhanOptions,
+  userRole,
+}: {
+  padukuhanOptions: { id: string; nama: string }[];
+  userRole: UserRole;
+}) {
   const [page, setPage] = useState(1);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusData | "">("");
   const [jenisTanah, setJenisTanah] = useState<JenisTanah | "">("");
@@ -39,6 +49,17 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
     padukuhanId: padukuhanId || undefined,
   });
 
+  const deleteMutation = trpc.tkd.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Data TKD berhasil dihapus");
+      refetch();
+      setShowDelete(false);
+    },
+    onError: (err) => {
+      toast.error(`Gagal menghapus: ${err.message}`);
+    },
+  });
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await refetch();
@@ -47,8 +68,17 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
 
   return (
     <div className="animate-fadeUp">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <div className="section-title-heritage" style={{ margin: 0 }}>DATA TANAH KAS DESA</div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 24,
+        }}
+      >
+        <div className="section-title-heritage" style={{ margin: 0 }}>
+          DATA TANAH KAS DESA
+        </div>
         <div style={{ display: "flex", gap: 10 }}>
           <button
             onClick={handleRefresh}
@@ -62,25 +92,37 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
               background: "transparent",
               border: "1.5px solid var(--gold-500)",
               borderRadius: 6,
-              cursor: (isRefreshing || isLoading) ? "not-allowed" : "pointer",
+              cursor: isRefreshing || isLoading ? "not-allowed" : "pointer",
               fontFamily: '"Cinzel", serif',
               fontWeight: 600,
               fontSize: 12,
               color: "var(--navy-800)",
               letterSpacing: 0.5,
-              opacity: (isRefreshing || isLoading) ? 0.6 : 1,
+              opacity: isRefreshing || isLoading ? 0.6 : 1,
               transition: "opacity 0.2s",
             }}
           >
             <RefreshCw
               size={14}
               style={{
-                animation: (isRefreshing || isLoading) ? "spin 0.8s linear infinite" : "none",
+                animation:
+                  isRefreshing || isLoading
+                    ? "spin 0.8s linear infinite"
+                    : "none",
               }}
             />
             {isRefreshing ? "MEMUAT..." : "REFRESH"}
           </button>
-          <Link href="/admin/tkd/create" className="btn-heritage" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+          <Link
+            href="/admin/tkd/create"
+            className="btn-heritage"
+            style={{
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
             <Plus size={16} /> TAMBAH DATA
           </Link>
         </div>
@@ -88,7 +130,16 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Filters */}
-      <div className="card-heritage" style={{ padding: 20, marginBottom: 24, display: "flex", gap: 16, flexWrap: "wrap" }}>
+      <div
+        className="card-heritage"
+        style={{
+          padding: 20,
+          marginBottom: 24,
+          display: "flex",
+          gap: 16,
+          flexWrap: "wrap",
+        }}
+      >
         <div style={{ flex: "1 1 200px" }}>
           <div className="label-heritage">Pencarian</div>
           <div style={{ position: "relative" }}>
@@ -100,13 +151,26 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
               onChange={(e) => setSearch(e.target.value)}
               style={{ paddingLeft: 36 }}
             />
-            <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--ink-soft)" }} />
+            <Search
+              size={16}
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--ink-soft)",
+              }}
+            />
           </div>
         </div>
 
         <div style={{ flex: "1 1 150px" }}>
           <div className="label-heritage">Status</div>
-          <select className="select-heritage" value={status} onChange={(e) => setStatus(e.target.value as StatusData)}>
+          <select
+            className="select-heritage"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as StatusData)}
+          >
             <option value="">Semua Status</option>
             <option value="DRAFT">Draft</option>
             <option value="PENDING_REVIEW">Menunggu Review</option>
@@ -117,7 +181,11 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
 
         <div style={{ flex: "1 1 150px" }}>
           <div className="label-heritage">Jenis Tanah</div>
-          <select className="select-heritage" value={jenisTanah} onChange={(e) => setJenisTanah(e.target.value as JenisTanah)}>
+          <select
+            className="select-heritage"
+            value={jenisTanah}
+            onChange={(e) => setJenisTanah(e.target.value as JenisTanah)}
+          >
             <option value="">Semua Jenis</option>
             <option value="TANAH_KAS">Tanah Kas</option>
             <option value="PELUNGGUH">Pelungguh</option>
@@ -127,10 +195,16 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
 
         <div style={{ flex: "1 1 150px" }}>
           <div className="label-heritage">Padukuhan</div>
-          <select className="select-heritage" value={padukuhanId} onChange={(e) => setPadukuhanId(e.target.value)}>
+          <select
+            className="select-heritage"
+            value={padukuhanId}
+            onChange={(e) => setPadukuhanId(e.target.value)}
+          >
             <option value="">Semua Padukuhan</option>
             {padukuhanOptions.map((p) => (
-              <option key={p.id} value={p.id}>{p.nama}</option>
+              <option key={p.id} value={p.id}>
+                {p.nama}
+              </option>
             ))}
           </select>
         </div>
@@ -143,9 +217,9 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
             <thead>
               <tr>
                 <th style={{ width: 50 }}>No</th>
-                <th style={{ textAlign: "left" }}>Nama TKD</th>
+                <th style={{ textAlign: "left" }}>Jenis Tanah Kalurahan</th>
                 <th style={{ textAlign: "left" }}>Lokasi</th>
-                <th>Jenis & Luas</th>
+                <th>Luas</th>
                 <th>Status</th>
                 <th>Aksi</th>
               </tr>
@@ -153,41 +227,89 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} style={{ padding: "40px 0", fontStyle: "italic" }}>Memuat data...</td>
+                  <td
+                    colSpan={6}
+                    style={{ padding: "40px 0", fontStyle: "italic" }}
+                  >
+                    Memuat data...
+                  </td>
                 </tr>
               ) : data?.items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ padding: "40px 0", fontStyle: "italic" }}>Tidak ada data ditemukan.</td>
+                  <td
+                    colSpan={6}
+                    style={{ padding: "40px 0", fontStyle: "italic" }}
+                  >
+                    Tidak ada data ditemukan.
+                  </td>
                 </tr>
               ) : (
                 data?.items.map((item, idx) => (
                   <tr key={item.id}>
                     <td>{(page - 1) * 10 + idx + 1}</td>
                     <td style={{ textAlign: "left" }}>
-                      <div style={{ fontWeight: 600, color: "var(--navy-900)" }}>{item.nama}</div>
-                      <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>{item.kode || "-"}</div>
+                      <div>{JENIS_LABEL[item.jenisTanah]}</div>
                     </td>
                     <td style={{ textAlign: "left" }}>
-                      <div style={{ fontWeight: 500 }}>{item.padukuhan.nama}</div>
+                      <div style={{ fontWeight: 500 }}>
+                        {item.padukuhan.nama}
+                      </div>
                     </td>
                     <td>
-                      <div>{JENIS_LABEL[item.jenisTanah]}</div>
-                      <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>{item.luasHa.toFixed(4)} Ha</div>
+                      <div style={{ fontSize: 13, color: "var(--ink-soft)" }}>
+                        {item.luasHa.toFixed(4)} Ha
+                      </div>
                     </td>
                     <td>
-                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${STATUS_BADGE[item.status]}`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-bold ${STATUS_BADGE[item.status]}`}
+                      >
                         {item.status.replace("_", " ")}
                       </span>
                     </td>
                     <td>
-                      <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
-                        <Link href={`/admin/tkd/${item.id}`} style={{ color: "var(--navy-600)" }} title="Lihat Detail">
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <Link
+                          href={`/admin/tkd/${item.id}`}
+                          style={{ color: "var(--navy-600)" }}
+                          title="Lihat Detail"
+                        >
                           <Eye size={18} />
                         </Link>
-                        {item.status !== "APPROVED" && (
-                          <Link href={`/admin/tkd/${item.id}/edit`} style={{ color: "var(--gold-600)" }} title="Edit">
+                        {(userRole === UserRole.ADMIN_DESA ||
+                          userRole === UserRole.SUPER_ADMIN) && (
+                          <Link
+                            href={`/admin/tkd/${item.id}/edit`}
+                            style={{ color: "var(--gold-600)" }}
+                            title="Edit"
+                          >
                             <Edit size={18} />
                           </Link>
+                        )}
+                        {(userRole === UserRole.ADMIN_DESA ||
+                          userRole === UserRole.SUPER_ADMIN) && (
+                          <button
+                            onClick={() => {
+                              setDeleteId(item.id);
+                              setShowDelete(true);
+                            }}
+                            style={{
+                              color: "#c62828",
+                              background: "none",
+                              border: "none",
+                              cursor: "pointer",
+                              padding: 0,
+                            }}
+                            title="Hapus"
+                          >
+                            <Trash2 size={18} />
+                          </button>
                         )}
                       </div>
                     </td>
@@ -210,6 +332,16 @@ export function TkdListClient({ padukuhanOptions }: { padukuhanOptions: { id: st
           />
         )}
       </div>
+
+      <ConfirmDialog
+        open={showDelete}
+        title="Hapus Data TKD"
+        message="Apakah Anda yakin ingin menghapus data TKD ini? Data yang dihapus tidak akan ditampilkan lagi (soft delete)."
+        confirmLabel="Ya, Hapus"
+        confirmVariant="danger"
+        onConfirm={() => deleteMutation.mutate({ id: deleteId })}
+        onCancel={() => setShowDelete(false)}
+      />
     </div>
   );
 }

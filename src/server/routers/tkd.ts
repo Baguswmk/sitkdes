@@ -384,25 +384,20 @@ export const tkdRouter = createTRPCRouter({
   /**
    * Update TKD — OPERATOR+ (own record only, unless Admin).
    */
-  update: operatorProcedure
+  update: adminProcedure
     .input(tkdUpdateSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, geometryGeoJson, ...rest } = input;
-      const callerRole = (ctx.session.user as { role: UserRole }).role;
       const callerId = ctx.session.user.id;
 
       const tkd = await ctx.db.tanahKasDesa.findFirst({
         where: {
           id,
           deletedAt: null,
-          ...(callerRole === UserRole.OPERATOR ? { createdById: callerId } : {}),
         },
       });
 
       if (!tkd) throw new TRPCError({ code: "NOT_FOUND", message: "Data TKD tidak ditemukan" });
-      if (tkd.status === "APPROVED") {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Data yang sudah disetujui tidak bisa diedit" });
-      }
 
       // Build update data
       const updateData: Record<string, unknown> = {

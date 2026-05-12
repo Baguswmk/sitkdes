@@ -92,7 +92,7 @@ export default function MapViewer({ data }: Props) {
                 </tbody>
               </table>
               <a
-                href={`/login?callbackUrl=/admin/tkd/${item.id}`}
+                href={`/admin/tkd/${item.id}`}
                 style={{
                   display: "block", textAlign: "center", background: "var(--navy-800)", color: "white",
                   padding: "6px 0", borderRadius: 4, textDecoration: "none", marginTop: 10, fontSize: 12

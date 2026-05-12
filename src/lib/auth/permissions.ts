@@ -40,7 +40,7 @@ type Action =
 
 const PERMISSIONS: Record<Action, UserRole[]> = {
   "tkd:create":         ["OPERATOR", "ADMIN_DESA", "SUPER_ADMIN"],
-  "tkd:edit":           ["OPERATOR", "ADMIN_DESA", "SUPER_ADMIN"],
+  "tkd:edit":           ["ADMIN_DESA", "SUPER_ADMIN"],
   "tkd:delete":         ["ADMIN_DESA", "SUPER_ADMIN"],
   "tkd:submit":         ["OPERATOR", "ADMIN_DESA", "SUPER_ADMIN"],
   "tkd:approve":        ["ADMIN_DESA", "SUPER_ADMIN"],

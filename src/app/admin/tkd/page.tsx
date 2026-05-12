@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth/config";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db/client";
 import { TkdListClient } from "./TkdListClient";
+import { UserRole } from "@prisma/client";
 
 export default async function TkdListPage() {
   const session = await auth();
@@ -13,5 +14,5 @@ export default async function TkdListPage() {
     orderBy: { urutan: "asc" },
   });
 
-  return <TkdListClient padukuhanOptions={padukuhanList} />;
+  return <TkdListClient padukuhanOptions={padukuhanList} userRole={session.user.role as UserRole} />;
 }
