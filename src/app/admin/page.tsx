@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/config";
 import { db } from "@/lib/db/client";
 import { StatusData } from "@prisma/client";
@@ -7,6 +8,10 @@ export default async function AdminDashboardPage() {
   const session = await auth();
   const userId = session?.user?.id;
   const userRole = (session?.user as { role?: string })?.role ?? "OPERATOR";
+
+  if (userRole === "VIEWER") {
+    redirect("/");
+  }
 
   const [totalBidang, pending, recentLogs] = await Promise.all([
     db.tanahKasDesa.count({ where: { deletedAt: null } }),
