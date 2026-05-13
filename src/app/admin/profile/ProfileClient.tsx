@@ -83,7 +83,7 @@ export default function ProfileClient({ user }: Props) {
                 borderRadius: 999, background: "var(--gold-100)", color: "var(--navy-900)", 
                 fontFamily: '"Manrope", sans-serif', fontSize: 13, fontWeight: 700 
               }}>
-                {user.role.replace("_", " ")}
+                {user.role === "VIEWER" ? "MASYARAKAT" : user.role.replace("_", " ")}
               </span>
             </dd>
           </div>
@@ -91,7 +91,8 @@ export default function ProfileClient({ user }: Props) {
       </div>
 
       {/* Ubah Password */}
-      <form onSubmit={handleSubmit} className="card-heritage" style={{ padding: 32, display: "flex", flexDirection: "column", gap: 20 }}>
+      {(user.role === "ADMIN_DESA" || user.role === "SUPER_ADMIN") && (
+        <form onSubmit={handleSubmit} className="card-heritage" style={{ padding: 32, display: "flex", flexDirection: "column", gap: 20 }}>
         <h2 style={{ fontFamily: '"Cinzel", serif', fontSize: 18, fontWeight: 700, color: "var(--navy-900)", marginBottom: 4, borderBottom: "1px solid rgba(160,125,47,.2)", paddingBottom: 12 }}>
           Ubah Password
         </h2>
@@ -146,6 +147,7 @@ export default function ProfileClient({ user }: Props) {
           </button>
         </div>
       </form>
+      )}
     </div>
   );
 }

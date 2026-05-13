@@ -1,4 +1,4 @@
-import { createTRPCRouter, publicProcedure, adminProcedure } from "@/server/trpc";
+import { createTRPCRouter, publicProcedure, viewerProcedure, adminProcedure } from "@/server/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { logActivity, AuditAction } from "@/lib/audit/logger";
@@ -37,7 +37,7 @@ export const padukuhanRouter = createTRPCRouter({
   /**
    * List all padukuhan (including inactive) — admin.
    */
-  listAdmin: adminProcedure.query(async ({ ctx }) => {
+  listAdmin: viewerProcedure.query(async ({ ctx }) => {
     return ctx.db.padukuhan.findMany({
       orderBy: [{ urutan: "asc" }, { nama: "asc" }],
       include: {
@@ -83,6 +83,21 @@ export const padukuhanRouter = createTRPCRouter({
   update: adminProcedure
     .input(z.object({ id: z.string(), data: padukuhanInputSchema.partial() }))
     .mutation(async ({ ctx, input }) => {
+      if (input.data.nama) {
+        const existing = await ctx.db.padukuhan.findFirst({
+          where: {
+            nama: input.data.nama,
+            id: { not: input.id },
+          },
+        });
+        if (existing) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Padukuhan dengan nama tersebut sudah ada",
+          });
+        }
+      }
+
       const padukuhan = await ctx.db.padukuhan.update({
         where: { id: input.id },
         data: input.data,

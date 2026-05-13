@@ -113,18 +113,20 @@ export function TkdListClient({
             />
             {isRefreshing ? "MEMUAT..." : "REFRESH"}
           </button>
-          <Link
-            href="/admin/tkd/create"
-            className="btn-heritage"
-            style={{
-              textDecoration: "none",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <Plus size={16} /> TAMBAH DATA
-          </Link>
+          {userRole !== UserRole.VIEWER && (
+            <Link
+              href="/admin/tkd/create"
+              className="btn-heritage"
+              style={{
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <Plus size={16} /> TAMBAH DATA
+            </Link>
+          )}
         </div>
       </div>
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>

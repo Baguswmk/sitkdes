@@ -20,6 +20,7 @@ enum UserRole {
   SUPER_ADMIN
   ADMIN_DESA
   OPERATOR
+  VIEWER
 }
 
 enum UserStatus {

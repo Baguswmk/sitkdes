@@ -21,11 +21,11 @@ type NavItem = {
   href: string;
   label: string;
   icon: React.ReactNode;
-  minRole?: "OPERATOR" | "ADMIN_DESA" | "SUPER_ADMIN";
+  minRole?: "VIEWER" | "OPERATOR" | "ADMIN_DESA" | "SUPER_ADMIN";
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/admin", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+  { href: "/admin", label: "Dashboard", icon: <LayoutDashboard size={18} />, minRole: "OPERATOR" },
   { href: "/admin/tkd", label: "Kelola TKD", icon: <ClipboardList size={18} /> },
   { href: "/admin/peta-lengkap", label: "Peta Lengkap", icon: <Map size={18} /> },
   { href: "/admin/padukuhan", label: "Kelola Padukuhan", icon: <MapPin size={18} />, minRole: "ADMIN_DESA" },
@@ -35,13 +35,14 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const ROLE_LEVEL: Record<string, number> = {
-  SUPER_ADMIN: 3, ADMIN_DESA: 2, OPERATOR: 1,
+  SUPER_ADMIN: 3, ADMIN_DESA: 2, OPERATOR: 1, VIEWER: 0,
 };
 
 const ROLE_BADGE: Record<string, { label: string; color: string }> = {
   SUPER_ADMIN: { label: "Super Admin", color: "#c62828" },
   ADMIN_DESA:  { label: "Admin Desa",  color: "#1e3070" },
   OPERATOR:    { label: "Operator",    color: "#546e7a" },
+  VIEWER:      { label: "Masyarakat",  color: "#6a1b9a" },
 };
 
 type Props = {

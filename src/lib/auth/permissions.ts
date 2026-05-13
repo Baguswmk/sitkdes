@@ -6,6 +6,7 @@ const ROLE_LEVEL: Record<UserRole, number> = {
   SUPER_ADMIN: 3,
   ADMIN_DESA: 2,
   OPERATOR: 1,
+  VIEWER: 0,
 };
 
 /**

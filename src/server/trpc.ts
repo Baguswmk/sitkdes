@@ -42,6 +42,20 @@ const enforceAuth = t.middleware(({ ctx, next }) => {
   });
 });
 
+const enforceViewer = t.middleware(({ ctx, next }) => {
+  if (!ctx.session?.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Belum login" });
+  }
+  const role = (ctx.session.user as { role: UserRole }).role;
+  if (!hasMinRole(role, UserRole.VIEWER)) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Akses ditolak: minimal role Viewer",
+    });
+  }
+  return next({ ctx: { ...ctx, session: ctx.session } });
+});
+
 const enforceOperator = t.middleware(({ ctx, next }) => {
   if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "Belum login" });
@@ -88,6 +102,7 @@ const enforceSuperAdmin = t.middleware(({ ctx, next }) => {
 
 export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(enforceAuth);
+export const viewerProcedure = t.procedure.use(enforceViewer);
 export const operatorProcedure = t.procedure.use(enforceOperator);
 export const adminProcedure = t.procedure.use(enforceAdmin);
 export const superAdminProcedure = t.procedure.use(enforceSuperAdmin);

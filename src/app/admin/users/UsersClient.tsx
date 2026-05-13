@@ -306,16 +306,20 @@ export function UsersClient({
                             ? "#ffebee"
                             : item.role === "ADMIN_DESA"
                               ? "#e8eaf6"
-                              : "#eceff1",
+                              : item.role === "VIEWER"
+                                ? "#f3e5f5"
+                                : "#eceff1",
                         color:
                           item.role === "SUPER_ADMIN"
                             ? "#c62828"
                             : item.role === "ADMIN_DESA"
                               ? "#1e3070"
-                              : "#546e7a",
+                              : item.role === "VIEWER"
+                                ? "#6a1b9a"
+                                : "#546e7a",
                       }}
                     >
-                      {item.role.replace("_", " ")}
+                      {item.role === "VIEWER" ? "MASYARAKAT" : item.role.replace("_", " ")}
                     </span>
                   </td>
                   <td style={{ textAlign: "center" }}>
@@ -426,6 +430,26 @@ export function UsersClient({
         <ModalWrapper
           title="Tambah Pengguna"
           onClose={() => setIsCreateOpen(false)}
+          footer={
+            <>
+              <button
+                type="button"
+                onClick={() => setIsCreateOpen(false)}
+                className="btn-heritage-pill"
+                style={{ background: "transparent", color: "var(--navy-800)" }}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                form="create-user-form"
+                disabled={isSaving}
+                className="btn-heritage"
+              >
+                {isSaving ? "Menyimpan..." : "Simpan"}
+              </button>
+            </>
+          }
         >
           <form
             id="create-user-form"
@@ -515,6 +539,7 @@ export function UsersClient({
                   <option value={UserRole.OPERATOR}>Operator</option>
                   <option value={UserRole.ADMIN_DESA}>Admin Desa</option>
                   <option value={UserRole.SUPER_ADMIN}>Super Admin</option>
+                  <option value={UserRole.VIEWER}>Masyarakat</option>
                 </select>
               </div>
               <div>
@@ -577,31 +602,6 @@ export function UsersClient({
               </p>
             </div>
           </form>
-          <div
-            style={{
-              marginTop: 24,
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 12,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setIsCreateOpen(false)}
-              className="btn-heritage-pill"
-              style={{ background: "transparent", color: "var(--navy-800)" }}
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              form="create-user-form"
-              disabled={isSaving}
-              className="btn-heritage"
-            >
-              {isSaving ? "Menyimpan..." : "Simpan"}
-            </button>
-          </div>
         </ModalWrapper>
       )}
 
@@ -610,6 +610,26 @@ export function UsersClient({
         <ModalWrapper
           title="Edit Pengguna"
           onClose={() => setIsEditOpen(false)}
+          footer={
+            <>
+              <button
+                type="button"
+                onClick={() => setIsEditOpen(false)}
+                className="btn-heritage-pill"
+                style={{ background: "transparent", color: "var(--navy-800)" }}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                form="edit-user-form"
+                disabled={isSaving}
+                className="btn-heritage"
+              >
+                {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
+              </button>
+            </>
+          }
         >
           <form
             id="edit-user-form"
@@ -698,6 +718,7 @@ export function UsersClient({
                     <option value={UserRole.OPERATOR}>Operator</option>
                     <option value={UserRole.ADMIN_DESA}>Admin Desa</option>
                     <option value={UserRole.SUPER_ADMIN}>Super Admin</option>
+                    <option value={UserRole.VIEWER}>Masyarakat</option>
                   </select>
                 </div>
                 <div>
@@ -736,31 +757,6 @@ export function UsersClient({
               </div>
             )}
           </form>
-          <div
-            style={{
-              marginTop: 24,
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 12,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setIsEditOpen(false)}
-              className="btn-heritage-pill"
-              style={{ background: "transparent", color: "var(--navy-800)" }}
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              form="edit-user-form"
-              disabled={isSaving}
-              className="btn-heritage"
-            >
-              {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
-            </button>
-          </div>
         </ModalWrapper>
       )}
 
@@ -769,6 +765,26 @@ export function UsersClient({
         <ModalWrapper
           title="Reset Password"
           onClose={() => setIsResetOpen(false)}
+          footer={
+            <>
+              <button
+                type="button"
+                onClick={() => setIsResetOpen(false)}
+                className="btn-heritage-pill"
+                style={{ background: "transparent", color: "var(--navy-800)" }}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                form="reset-password-form"
+                disabled={isSaving || !resetPasswordInput}
+                className="btn-heritage"
+              >
+                {isSaving ? "Mereset..." : "Reset Password"}
+              </button>
+            </>
+          }
         >
           <div style={{ marginBottom: 16 }}>
             <p
@@ -835,31 +851,6 @@ export function UsersClient({
               (Otomatis menggunakan format default bulan ini).
             </p>
           </form>
-          <div
-            style={{
-              marginTop: 24,
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 12,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setIsResetOpen(false)}
-              className="btn-heritage-pill"
-              style={{ background: "transparent", color: "var(--navy-800)" }}
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              form="reset-password-form"
-              disabled={isSaving || !resetPasswordInput}
-              className="btn-heritage"
-            >
-              {isSaving ? "Mereset..." : "Reset Password"}
-            </button>
-          </div>
         </ModalWrapper>
       )}
 
@@ -884,10 +875,12 @@ function ModalWrapper({
   title,
   onClose,
   children,
+  footer,
 }: {
   title: string;
   onClose: () => void;
   children: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   return (
     <div
@@ -901,6 +894,7 @@ function ModalWrapper({
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
+        minHeight: "100vh",
         animation: "fadeIn 0.15s ease",
       }}
     >
@@ -916,6 +910,7 @@ function ModalWrapper({
           display: "flex",
           flexDirection: "column",
           maxHeight: "90vh",
+          overflow: "hidden",
         }}
       >
         <div
@@ -925,6 +920,7 @@ function ModalWrapper({
             justifyContent: "space-between",
             padding: "20px 24px",
             borderBottom: "1px solid rgba(160,125,47,.2)",
+            flexShrink: 0,
           }}
         >
           <div
@@ -949,7 +945,21 @@ function ModalWrapper({
             <X size={20} />
           </button>
         </div>
-        <div style={{ padding: "24px", overflowY: "auto" }}>{children}</div>
+        <div style={{ padding: "24px", overflowY: "auto", flex: 1, minHeight: 0 }}>{children}</div>
+        {footer && (
+          <div
+            style={{
+              padding: "16px 24px",
+              borderTop: "1px solid rgba(160,125,47,.2)",
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 12,
+              flexShrink: 0,
+            }}
+          >
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { createTRPCRouter, publicProcedure, operatorProcedure, adminProcedure } from "@/server/trpc";
+import { createTRPCRouter, publicProcedure, viewerProcedure, operatorProcedure, adminProcedure } from "@/server/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { logActivity, AuditAction } from "@/lib/audit/logger";
@@ -107,7 +107,7 @@ export const tkdRouter = createTRPCRouter({
   /**
    * Admin list spatial — all statuses, returns GeoJSON.
    */
-  listSpatialAdmin: operatorProcedure
+  listSpatialAdmin: viewerProcedure
     .input(
       z.object({
         padukuhanId: z.string().optional(),
@@ -176,7 +176,7 @@ export const tkdRouter = createTRPCRouter({
   /**
    * Admin list with filters, pagination.
    */
-  listAdmin: operatorProcedure
+  listAdmin: viewerProcedure
     .input(tkdFilterSchema)
     .query(async ({ ctx, input }) => {
       const callerRole = (ctx.session.user as { role: UserRole }).role;
@@ -237,7 +237,7 @@ export const tkdRouter = createTRPCRouter({
   /**
    * Get single TKD by ID.
    */
-  getById: operatorProcedure
+  getById: viewerProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const callerRole = (ctx.session.user as { role: UserRole }).role;

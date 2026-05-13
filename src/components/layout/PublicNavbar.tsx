@@ -24,6 +24,7 @@ const ROLE_LABEL: Record<string, string> = {
   SUPER_ADMIN: "Super Admin",
   ADMIN_DESA: "Admin Desa",
   OPERATOR: "Operator",
+  VIEWER: "Masyarakat",
   PUBLIC: "Publik",
 };
 
@@ -218,26 +219,28 @@ function ProfileChip({
             </span>
           </div>
 
-          <Link
-            href="/admin"
-            role="menuitem"
-            onClick={() => setOpen(false)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "11px 16px",
-              fontFamily: '"Cinzel", serif',
-              fontSize: 11,
-              letterSpacing: "1.5px",
-              color: "var(--cream-100)",
-              textDecoration: "none",
-              borderBottom: "1px solid rgba(160,125,47,.15)",
-            }}
-          >
-            <LayoutDashboard size={14} style={{ color: "var(--gold-400)" }} />
-            DASHBOARD
-          </Link>
+          {role !== "VIEWER" && (
+            <Link
+              href="/admin"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "11px 16px",
+                fontFamily: '"Cinzel", serif',
+                fontSize: 11,
+                letterSpacing: "1.5px",
+                color: "var(--cream-100)",
+                textDecoration: "none",
+                borderBottom: "1px solid rgba(160,125,47,.15)",
+              }}
+            >
+              <LayoutDashboard size={14} style={{ color: "var(--gold-400)" }} />
+              DASHBOARD
+            </Link>
+          )}
 
           <Link
             href="/admin/profile"
