@@ -34,21 +34,28 @@ const MapEditor = dynamic(() => import("@/components/map/MapEditor"), {
 
 const PENGGUNAAN_OPTS = [
   "Pertanian",
-  "Perumahan",
-  "Keamanan",
-  "RTH",
-  "Lainnya",
+  "Non-Pertanian",
 ];
 const PEMANFAATAN_OPTS = [
+  "Balai Dusun",
+  "Bank sampah",
+  "Gedung Serbaguna",
+  "Industri",
+  "Irigasi",
+  "Jalan",
+  "Lapangan",
+  "Makam",
+  "Masjid",
+  "Pariwisata",
+  "Pendidikan",
+  "Perdagangan",
+  "Perkantoran",
+  "Perkebunan",
+  "Puskesmas",
   "Sawah",
+  "Selokan",
+  "Sinder Tebu",
   "Tegalan",
-  "Kebun",
-  "Rumah Warga",
-  "Taman Desa",
-  "Pos Kamling",
-  "Balai Warga",
-  "Rumah Pensiunan",
-  "Lainnya",
 ];
 
 const tkdSchema = z.object({

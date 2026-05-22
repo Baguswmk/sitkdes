@@ -26,16 +26,27 @@ interface Props {
   padukuhanOptions: PadukuhanOption[];
 }
 
-const PENGGUNAAN_OPTS = ["Pertanian", "Perumahan", "Keamanan", "RTH"];
+const PENGGUNAAN_OPTS = ["Pertanian", "Non-Pertanian"];
 const PEMANFAATAN_OPTS = [
+  "Balai Dusun",
+  "Bank sampah",
+  "Gedung Serbaguna",
+  "Industri",
+  "Irigasi",
+  "Jalan",
+  "Lapangan",
+  "Makam",
+  "Masjid",
+  "Pariwisata",
+  "Pendidikan",
+  "Perdagangan",
+  "Perkantoran",
+  "Perkebunan",
+  "Puskesmas",
   "Sawah",
+  "Selokan",
+  "Sinder Tebu",
   "Tegalan",
-  "Kebun",
-  "Rumah Warga",
-  "Taman Desa",
-  "Pos Kamling",
-  "Balai Warga",
-  "Rumah Pensiunan",
 ];
 
 const BADGE_CONFIG: Record<string, { label: string; className: string }> = {
