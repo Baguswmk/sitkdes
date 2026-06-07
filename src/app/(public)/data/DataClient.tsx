@@ -251,10 +251,21 @@ export function DataClient({ padukuhanOptions }: Props) {
 
   const filtered = useMemo(() => {
     return rawData.filter((r) => {
-      if (filterPadukuhan && r.padukuhan !== filterPadukuhan) return false;
+      if (
+        filterPadukuhan &&
+        r.padukuhan.toLowerCase() !== filterPadukuhan.toLowerCase()
+      )
+        return false;
       if (filterJenis && r.jenisTanah !== filterJenis) return false;
-      if (filterPenggunaan && r.penggunaan !== filterPenggunaan) return false;
-      if (filterPemanfaatan && r.pemanfaatan !== filterPemanfaatan)
+      if (
+        filterPenggunaan &&
+        r.penggunaan.toLowerCase() !== filterPenggunaan.toLowerCase()
+      )
+        return false;
+      if (
+        filterPemanfaatan &&
+        r.pemanfaatan?.toLowerCase() !== filterPemanfaatan.toLowerCase()
+      )
         return false;
       return true;
     });
