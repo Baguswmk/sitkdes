@@ -14,6 +14,7 @@ interface PadukuhanOption {
 // Represents a public-safe TKD row (no sensitive fields)
 interface TkdPublicRow {
   id: string;
+  nub: string | null;
   nama: string;
   padukuhan: string;
   jenisTanah: "TANAH_KAS" | "PELUNGGUH" | "PENGAREM_AREM" | "LAINNYA";
@@ -247,6 +248,7 @@ export function DataClient({ padukuhanOptions }: Props) {
   const [filterJenis, setFilterJenis] = useState("");
   const [filterPenggunaan, setFilterPenggunaan] = useState("");
   const [filterPemanfaatan, setFilterPemanfaatan] = useState("");
+  const [filterNub, setFilterNub] = useState("");
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
@@ -267,6 +269,11 @@ export function DataClient({ padukuhanOptions }: Props) {
         r.pemanfaatan?.toLowerCase() !== filterPemanfaatan.toLowerCase()
       )
         return false;
+      if (filterNub) {
+        // Tolerant match: "1" → "0001", "01" → "0001", "0001" → "0001"
+        const q = filterNub.trim().replace(/\D/g, "").padStart(4, "0");
+        if (!r.nub || r.nub !== q) return false;
+      }
       return true;
     });
   }, [
@@ -275,6 +282,7 @@ export function DataClient({ padukuhanOptions }: Props) {
     filterJenis,
     filterPenggunaan,
     filterPemanfaatan,
+    filterNub,
   ]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -468,8 +476,28 @@ export function DataClient({ padukuhanOptions }: Props) {
           boxShadow: "var(--shadow-mid)",
           marginBottom: 28,
         }}
-        className="grid-cols-4 max-[768px]:grid-cols-2 max-[480px]:grid-cols-1"
+        className="grid-cols-5 max-[960px]:grid-cols-3 max-[640px]:grid-cols-2 max-[480px]:grid-cols-1"
       >
+        {/* NUB Search */}
+        <div>
+          <label className="label-heritage" htmlFor="f-nub">
+            Cari NUB
+          </label>
+          <input
+            id="f-nub"
+            type="text"
+            className="select-heritage"
+            placeholder="mis. 0001"
+            value={filterNub}
+            maxLength={6}
+            onChange={(e) => {
+              setFilterNub(e.target.value);
+              handleFilterChange();
+            }}
+            style={{ fontFamily: '"Courier New", monospace', letterSpacing: "2px" }}
+          />
+        </div>
+
         {/* Padukuhan */}
         <div>
           <label className="label-heritage" htmlFor="f-padukuhan">
@@ -766,6 +794,7 @@ export function DataClient({ padukuhanOptions }: Props) {
             <thead>
               <tr>
                 <th style={{ width: 52 }}>No.</th>
+                <th style={{ width: 80 }}>NUB</th>
                 <th style={{ textAlign: "left", paddingLeft: 16 }}>
                   Padukuhan
                 </th>
@@ -802,6 +831,17 @@ export function DataClient({ padukuhanOptions }: Props) {
                     <tr key={row.id}>
                       <td style={{ fontWeight: 600, color: "var(--navy-800)" }}>
                         {(page - 1) * PAGE_SIZE + i + 1}
+                      </td>
+                      <td
+                        style={{
+                          fontFamily: '"Courier New", monospace',
+                          fontWeight: 700,
+                          fontSize: 15,
+                          letterSpacing: "1px",
+                          color: row.nub ? "var(--navy-900)" : "var(--ink-soft)",
+                        }}
+                      >
+                        {row.nub ?? "—"}
                       </td>
                       <td style={{ textAlign: "left", paddingLeft: 16 }}>
                         {row.padukuhan}

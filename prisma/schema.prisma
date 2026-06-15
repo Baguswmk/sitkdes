@@ -4,7 +4,9 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
 }
+
 
 datasource db {
   provider   = "postgresql"
@@ -169,6 +171,7 @@ model TanahKasDesa {
 
   // Identitas
   kode      String? @unique
+  nub       String? @unique // Nomor Urut Bangunan, e.g. "0001" — set via DB sequence
   nama      String
   deskripsi String?
 
@@ -218,6 +221,7 @@ model TanahKasDesa {
   attachments Attachment[]
   history     TanahKasHistory[]
 
+  @@index([nub])
   @@index([padukuhanId])
   @@index([jenisTanah])
   @@index([status])

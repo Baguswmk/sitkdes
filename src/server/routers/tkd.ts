@@ -60,6 +60,7 @@ export const tkdRouter = createTRPCRouter({
       const rows = await ctx.db.$queryRaw<
         Array<{
           id: string;
+          nub: string | null;
           nama: string;
           padukuhan_nama: string;
           jenis_tanah: string;
@@ -72,6 +73,7 @@ export const tkdRouter = createTRPCRouter({
       >`
         SELECT
           t.id,
+          t.nub,
           t.nama,
           p.nama as padukuhan_nama,
           t."jenisTanah" as jenis_tanah,
@@ -93,6 +95,7 @@ export const tkdRouter = createTRPCRouter({
 
       return rows.map((r) => ({
         id: r.id,
+        nub: r.nub,
         nama: r.nama,
         padukuhan: r.padukuhan_nama,
         jenisTanah: r.jenis_tanah,
@@ -193,6 +196,7 @@ export const tkdRouter = createTRPCRouter({
               OR: [
                 { nama: { contains: input.search, mode: "insensitive" as const } },
                 { kode: { contains: input.search, mode: "insensitive" as const } },
+                { nub: { contains: input.search, mode: "insensitive" as const } },
               ],
             }
           : {}),
@@ -210,6 +214,7 @@ export const tkdRouter = createTRPCRouter({
           select: {
             id: true,
             kode: true,
+            nub: true,
             nama: true,
             jenisTanah: true,
             penggunaan: true,
@@ -324,16 +329,24 @@ export const tkdRouter = createTRPCRouter({
       const luasM2 = areaResult[0]?.area_m2 ?? 0;
       const luasHa = luasM2 / 10000;
 
+      // Generate NUB via PostgreSQL sequence (atomic, never reused)
+      const nubResult = await ctx.db.$queryRaw<[{ nub_val: string }]>`
+        SELECT LPAD(nextval('nub_seq')::text, 4, '0') AS nub_val
+      `;
+      const nub = nubResult[0]?.nub_val;
+      if (!nub) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Gagal generate NUB" });
+
       // Insert with geometry
       const result = await ctx.db.$queryRaw<[{ id: string }]>`
         INSERT INTO "TanahKasDesa" (
-          id, nama, "deskripsi", "jenisTanah", "kategoriPenggunaan",
+          id, nub, nama, "deskripsi", "jenisTanah", "kategoriPenggunaan",
           penggunaan, pemanfaatan, "padukuhanId", alamat,
           "statusKepemilikan", "alasHak", "nomorSertifikat",
           geometry, centroid, "luasM2", "luasHa",
           status, "createdById", "createdAt", "updatedAt"
         ) VALUES (
           gen_random_uuid()::text,
+          ${nub},
           ${rest.nama},
           ${rest.deskripsi ?? null},
           ${rest.jenisTanah}::"JenisTanah",
@@ -365,7 +378,7 @@ export const tkdRouter = createTRPCRouter({
           tanahKasId: newId,
           action: "CREATE",
           changedFields: {},
-          snapshot: { ...rest, luasM2, luasHa, status: "DRAFT" } as never,
+          snapshot: { ...rest, nub, luasM2, luasHa, status: "DRAFT" } as never,
           performedById: ctx.session.user.id,
         },
       });
@@ -375,10 +388,10 @@ export const tkdRouter = createTRPCRouter({
         action: AuditAction.TKD_CREATED,
         entityType: "TanahKasDesa",
         entityId: newId,
-        description: `TKD "${rest.nama}" berhasil dibuat`,
+        description: `TKD "${rest.nama}" (NUB: ${nub}) berhasil dibuat`,
       });
 
-      return { id: newId };
+      return { id: newId, nub };
     }),
 
   /**
