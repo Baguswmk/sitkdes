@@ -828,7 +828,7 @@ export function DataClient({ padukuhanOptions }: Props) {
                   return (
                     <tr key={row.id}>
                       <td style={{ fontWeight: 600, color: "var(--navy-800)" }}>
-                        {(page - 1) * PAGE_SIZE + i + 1}
+                        {(page - 1) * pageSize + i + 1}
                       </td>
                       <td
                         style={{
