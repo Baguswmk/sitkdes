@@ -33,7 +33,7 @@ const tkdFilterSchema = z.object({
   penggunaan: z.string().optional(),
   search: z.string().optional(),
   page: z.number().int().min(1).default(1),
-  perPage: z.number().int().min(1).max(100).default(20),
+  perPage: z.number().int().min(1).max(999999).default(10),
 });
 
 export const tkdRouter = createTRPCRouter({

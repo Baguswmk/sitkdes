@@ -236,9 +236,6 @@ function DonutChart({ data }: { data: TkdPublicRow[] }) {
   );
 }
 
-/* ─── Pagination ─────────────────────────────────────── */
-const PAGE_SIZE = 10;
-
 /* ─── Main Component ─────────────────────────────────── */
 export function DataClient({ padukuhanOptions }: Props) {
   const { data: tkdList, isLoading } = trpc.tkd.listPublic.useQuery({});
@@ -250,6 +247,7 @@ export function DataClient({ padukuhanOptions }: Props) {
   const [filterPemanfaatan, setFilterPemanfaatan] = useState("");
   const [filterNub, setFilterNub] = useState("");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const filtered = useMemo(() => {
     return rawData.filter((r) => {
@@ -285,8 +283,8 @@ export function DataClient({ padukuhanOptions }: Props) {
     filterNub,
   ]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const pageData = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   // Stats
   const totalLuas = filtered.reduce((s, r) => s + r.luasM2, 0);
@@ -893,8 +891,9 @@ export function DataClient({ padukuhanOptions }: Props) {
           currentPage={page}
           totalPages={totalPages}
           totalItems={filtered.length}
-          itemsPerPage={PAGE_SIZE}
+          itemsPerPage={pageSize}
           onPageChange={setPage}
+          onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
           itemName="bidang"
         />
       </div>

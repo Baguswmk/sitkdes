@@ -14,6 +14,13 @@ export function AuditPagination({ totalPages, totalItems, itemsPerPage }: { tota
     router.push("?" + params.toString());
   };
 
+  const handlePageSizeChange = (size: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("perPage", size.toString());
+    params.set("page", "1");
+    router.push("?" + params.toString());
+  };
+
   return (
     <Pagination
       currentPage={page}
@@ -21,6 +28,7 @@ export function AuditPagination({ totalPages, totalItems, itemsPerPage }: { tota
       totalItems={totalItems}
       itemsPerPage={itemsPerPage}
       onPageChange={handlePageChange}
+      onPageSizeChange={handlePageSizeChange}
       itemName="log aktivitas"
     />
   );

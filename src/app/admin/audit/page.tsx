@@ -10,7 +10,8 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
   const resolvedParams = await searchParams;
   const pageStr = Array.isArray(resolvedParams.page) ? resolvedParams.page[0] : resolvedParams.page;
   const page = parseInt(pageStr || "1", 10);
-  const itemsPerPage = 20;
+  const perPageStr = Array.isArray(resolvedParams.perPage) ? resolvedParams.perPage[0] : resolvedParams.perPage;
+  const itemsPerPage = Math.min(999999, Math.max(1, parseInt(perPageStr || "10", 10)));
   const skip = (page - 1) * itemsPerPage;
 
   const [total, logs] = await Promise.all([

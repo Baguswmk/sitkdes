@@ -25,7 +25,7 @@ export function PadukuhanClient({
   );
 
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const rawData = data || [];
   const totalPages = Math.max(1, Math.ceil(rawData.length / itemsPerPage));
   const pageData = rawData.slice(
@@ -264,6 +264,7 @@ export function PadukuhanClient({
           totalItems={rawData.length}
           itemsPerPage={itemsPerPage}
           onPageChange={setPage}
+          onPageSizeChange={(size) => { setItemsPerPage(size); setPage(1); }}
           itemName="padukuhan"
         />
       </div>

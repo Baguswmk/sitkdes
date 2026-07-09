@@ -31,6 +31,7 @@ export function TkdListClient({
   userRole: UserRole;
 }) {
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const [showDelete, setShowDelete] = useState(false);
   const [deleteId, setDeleteId] = useState("");
   const [search, setSearch] = useState("");
@@ -42,7 +43,7 @@ export function TkdListClient({
 
   const { data, isLoading, refetch } = trpc.tkd.listAdmin.useQuery({
     page,
-    perPage: 10,
+    perPage,
     search: search || undefined,
     status: (status as StatusData) || undefined,
     jenisTanah: (jenisTanah as JenisTanah) || undefined,
@@ -340,8 +341,9 @@ export function TkdListClient({
             currentPage={page}
             totalPages={data.totalPages}
             totalItems={data.total}
-            itemsPerPage={10}
+            itemsPerPage={perPage}
             onPageChange={setPage}
+            onPageSizeChange={(size) => { setPerPage(size); setPage(1); }}
             itemName="data TKD"
           />
         )}
