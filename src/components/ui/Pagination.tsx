@@ -26,19 +26,18 @@ export function Pagination({
   const endIdx = showAll ? totalItems : Math.min(currentPage * itemsPerPage, totalItems);
 
   const selectStyle: React.CSSProperties = {
-    fontFamily: '"Cinzel", serif',
-    fontSize: 11,
-    letterSpacing: "1px",
-    color: "var(--gold-100)",
-    background: "linear-gradient(180deg, var(--navy-700), var(--navy-900))",
+    fontFamily: '"Cormorant Garamond", serif',
+    fontSize: 14,
+    fontWeight: 600,
+    color: "var(--navy-900)",
+    background: "var(--cream-50)",
     border: "1px solid var(--gold-600)",
-    padding: "6px 10px",
-    borderRadius: 999,
+    padding: "4px 24px 4px 10px",
+    borderRadius: 6,
     cursor: "pointer",
     outline: "none",
     appearance: "none" as const,
     WebkitAppearance: "none" as const,
-    paddingRight: 28,
   };
 
   return (
@@ -76,9 +75,9 @@ export function Pagination({
               style={selectStyle}
               title="Jumlah baris per halaman"
             >
-              <option value={0}>Semua</option>
+              <option value={0} style={{ background: "var(--cream-50)", color: "var(--navy-900)" }}>Semua</option>
               {pageSizeOptions.map((s) => (
-                <option key={s} value={s}>
+                <option key={s} value={s} style={{ background: "var(--cream-50)", color: "var(--navy-900)" }}>
                   {s}
                 </option>
               ))}
@@ -87,11 +86,11 @@ export function Pagination({
             <span
               style={{
                 position: "absolute",
-                right: 10,
+                right: 8,
                 top: "50%",
                 transform: "translateY(-50%)",
                 pointerEvents: "none",
-                color: "var(--gold-400)",
+                color: "var(--gold-600)",
                 fontSize: 10,
               }}
             >
