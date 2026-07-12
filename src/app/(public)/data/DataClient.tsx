@@ -268,8 +268,8 @@ export function DataClient({ padukuhanOptions }: Props) {
       )
         return false;
       if (filterNub) {
-        // Tolerant match: "1" → "0001", "01" → "0001", "0001" → "0001"
-        const q = filterNub.trim().replace(/\D/g, "").padStart(4, "0");
+        // Tolerant match: "1" → "00001", "01" → "00001", "00001" → "00001"
+        const q = filterNub.trim().replace(/\D/g, "").padStart(5, "0");
         if (!r.nub || r.nub !== q) return false;
       }
       return true;

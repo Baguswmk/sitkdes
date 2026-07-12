@@ -33,7 +33,8 @@ WHERE t.id = sub.id;
 -- So the next new record gets 0474 (or whatever comes after the last backfilled)
 SELECT setval(
   'nub_seq',
-  COALESCE((SELECT MAX(CAST(nub AS INTEGER)) FROM "TanahKasDesa" WHERE nub IS NOT NULL), 0)
+  COALESCE((SELECT MAX(CAST(nub AS INTEGER)) FROM "TanahKasDesa" WHERE nub IS NOT NULL), 1),
+  (SELECT MAX(CAST(nub AS INTEGER)) FROM "TanahKasDesa" WHERE nub IS NOT NULL) IS NOT NULL
 );
 
 -- Step 6: Add Prisma index on nub column

@@ -331,7 +331,7 @@ export const tkdRouter = createTRPCRouter({
 
       // Generate NUB via PostgreSQL sequence (atomic, never reused)
       const nubResult = await ctx.db.$queryRaw<[{ nub_val: string }]>`
-        SELECT LPAD(nextval('nub_seq')::text, 4, '0') AS nub_val
+        SELECT LPAD(nextval('nub_seq')::text, 5, '0') AS nub_val
       `;
       const nub = nubResult[0]?.nub_val;
       if (!nub) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Gagal generate NUB" });

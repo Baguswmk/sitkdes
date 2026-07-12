@@ -171,7 +171,7 @@ model TanahKasDesa {
 
   // Identitas
   kode      String? @unique
-  nub       String? @unique // Nomor Urut Bangunan, e.g. "0001" — set via DB sequence
+  nub       String? @unique // Nomor Urut Bangunan, e.g. "00001" — set via DB sequence
   nama      String
   deskripsi String?
 
